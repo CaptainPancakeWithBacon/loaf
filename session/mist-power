@@ -2,7 +2,7 @@
 # Power menu in the Mist launcher style. Choosing an entry is the confirmation.
 c=$(printf 'Lock\nSuspend\nLog out\nRestart\nShut down\n' | fuzzel --dmenu --lines 5 --width 18)
 case "$c" in
-  Lock) swaylock -f ;;
+  Lock) loginctl lock-session ;;
   Suspend) systemctl suspend ;;
   "Log out") niri msg action quit --skip-confirmation ;;
   Restart) systemctl reboot ;;

@@ -20,6 +20,10 @@ link "$here/quickshell"        ~/.config/quickshell/mist
 link "$here/mako"              ~/.config/mako
 link "$here/fuzzel"            ~/.config/fuzzel
 link "$here/swaylock"          ~/.config/swaylock
+link "$here/hypr"              ~/.config/hypr
+# hypridle/hyprlock come from apt (sudo, Gijs's part); this keeps hypridle out of GNOME.
+mkdir -p ~/.config/systemd/user/hypridle.service.d
+install -m644 "$here/session/hypridle-niri-only.conf" ~/.config/systemd/user/hypridle.service.d/niri-only.conf
 cp "$here/src/niri/resources/niri-portals.conf" ~/.config/xdg-desktop-portal/niri-portals.conf
 
 sed "s|@HOME@|$HOME|" "$here/session/niri-mist.desktop.in" > "$here/session/niri-mist.desktop"

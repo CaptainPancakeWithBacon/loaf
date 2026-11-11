@@ -23,6 +23,8 @@ sub(r'(hotkey-overlay \{)', r'\1\n    skip-at-startup')
 sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" { spawn "mist-power"; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')
 sub(r'alacritty', 'ghostty')
+# Lock through logind so hypridle runs hyprlock (fingerprint) for the key, idle and suspend alike.
+sub(r'"Lock the Screen: swaylock" \{ spawn "swaylock"; \}', '"Lock the Screen" { spawn "loginctl" "lock-session"; }')
 # Coucou's island (X11 via xwayland-satellite, GDK_BACKEND=x11) floats at the top, never tiled.
 # Native Wayland Coucou idled at 23% of a core here; X11 + floating at 1.6% (measurements/baseline.tsv).
 src += '''
