@@ -23,4 +23,17 @@ sub(r'(hotkey-overlay \{)', r'\1\n    skip-at-startup')
 sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" { spawn "mist-power"; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')
 sub(r'alacritty', 'ghostty')
+# Coucou's island (X11 via xwayland-satellite, GDK_BACKEND=x11) floats at the top, never tiled.
+# Native Wayland Coucou idled at 23% of a core here; X11 + floating at 1.6% (measurements/baseline.tsv).
+src += '''
+window-rule {
+    match app-id="^Coucou-sys$"
+    open-floating true
+    open-focused false
+    default-floating-position x=0 y=0 relative-to="top"
+    border { off; }
+    focus-ring { off; }
+    shadow { off; }
+}
+'''
 open(sys.argv[2], "w").write(src)
