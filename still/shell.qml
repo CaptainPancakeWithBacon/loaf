@@ -22,6 +22,7 @@ ShellRoot {
         target: "launcher"
         function toggle(): void { if (!launcher.open) launcher.screen = focusedScreen(); launcher.open = !launcher.open }
         function search(q: string): void { launcher.screen = focusedScreen(); launcher.open = true; launcher.search(q) }
+        function launchFirst(q: string): void { launcher.open = true; launcher.launchFirst(q) }
     }
 
     Variants {

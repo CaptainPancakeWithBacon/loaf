@@ -1,4 +1,4 @@
-// niri state from its event stream (no polling). Workspaces only; the bar needs nothing else yet.
+// niri state from its event stream (no polling): workspaces for the bar, windows for the launcher.
 pragma Singleton
 import Quickshell
 import Quickshell.Io
@@ -8,6 +8,15 @@ Singleton {
     id: niri
     // [{id, idx, output, is_active, is_focused, active_window_id}], sorted by idx
     property var workspaces: []
+    // [{id, app_id, workspace_id, focus_timestamp, ...}]
+    property var windows: []
+
+    // The open window of a desktop entry (matched on desktop id or StartupWMClass), most recently focused first.
+    function windowFor(entry) {
+        const ids = [entry.id, entry.startupClass].filter(x => x).map(x => x.toLowerCase())
+        const ts = w => w.focus_timestamp ? w.focus_timestamp.secs * 1e9 + w.focus_timestamp.nanos : 0
+        return windows.filter(w => w.app_id && ids.includes(w.app_id.toLowerCase())).sort((a, b) => ts(b) - ts(a))[0] || null
+    }
 
     function on(output) { return workspaces.filter(w => w.output === output) }
 
@@ -43,6 +52,13 @@ Singleton {
                 is_active: w.output === out ? w.id === id : w.is_active,
                 is_focused: focused ? w.id === id : w.is_focused
             }))
+        } else if (e.WindowsChanged) {
+            windows = e.WindowsChanged.windows
+        } else if (e.WindowOpenedOrChanged) {
+            const w = e.WindowOpenedOrChanged.window
+            windows = windows.filter(x => x.id !== w.id).concat([w])
+        } else if (e.WindowClosed) {
+            windows = windows.filter(x => x.id !== e.WindowClosed.id)
         } else if (e.WorkspaceActiveWindowChanged) {
             const { workspace_id, active_window_id } = e.WorkspaceActiveWindowChanged
             workspaces = workspaces.map(w => w.id === workspace_id ? Object.assign({}, w, { active_window_id }) : w)

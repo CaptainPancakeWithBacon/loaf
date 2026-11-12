@@ -22,6 +22,10 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+    // Quickshell's entries ignore OnlyShowIn, so tools made for other desktops (LXQt, KDE, MATE screensavers)
+    // would show up. ponytail: matched by id; read OnlyShowIn from the files if more of these appear.
+    readonly property var otherDesktop: /^(lxqt-|screensavers-|systemsettings$|im-config$|org\.gnome\.Extensions$|com\.mattjakeman\.ExtensionManager$)/
+
     // GNOME Settings panels worth reaching by name (Displays left out: it only works in GNOME).
     readonly property var settings: [
         ["Wi-Fi", "wifi"], ["Network", "network"], ["Bluetooth", "bluetooth"], ["Sound", "sound"],
@@ -44,7 +48,7 @@ PanelWindow {
         const q = query.trim().toLowerCase()
         if (!q) return [] // empty search = just the field, nothing to scan
         const apps = DesktopEntries.applications.values
-            .filter(a => !a.noDisplay && !(a.categories || []).includes("Screensaver"))
+            .filter(a => !a.noDisplay && !win.otherDesktop.test(a.id))
             .map(a => ({ kind: "app", label: a.name, icon: a.icon, entry: a,
                          s: score(q, a.name, (a.genericName || "") + " " + (a.keywords || []).join(" ")) }))
             .filter(a => a.s > 0)
@@ -59,11 +63,18 @@ PanelWindow {
     onItemsChanged: sel = Math.min(sel, Math.max(0, items.length - 1))
 
     function search(q) { input.text = q } // for qs ipc tests
+    function launchFirst(q) { input.text = q; launch(items[0], false) }
 
-    function launch(it) {
+    // An app that is already open gets its window focused (also when it sits out of view);
+    // Shift+Enter starts a new one anyway.
+    function launch(it, fresh) {
         if (!it) return
         open = false
-        if (it.kind === "app") it.entry.execute()
+        const w = it.kind === "app" && !fresh ? Niri.windowFor(it.entry) : null
+        if (w) Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", String(w.id)])
+        else if (it.kind === "app" && it.entry.runInTerminal) // Quickshell's execute() ignores Terminal=true
+            Quickshell.execDetached(["ghostty", "-e"].concat(it.entry.command))
+        else if (it.kind === "app") it.entry.execute()
         else if (it.kind === "setting") Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", it.panel])
         else Quickshell.execDetached(["xdg-open", it.uri])
     }
@@ -113,8 +124,8 @@ PanelWindow {
                     Keys.onEscapePressed: win.open = false
                     Keys.onUpPressed: win.sel = Math.max(0, win.sel - 1)
                     Keys.onDownPressed: win.sel = Math.min(win.items.length - 1, win.sel + 1)
-                    Keys.onReturnPressed: win.launch(win.items[win.sel])
-                    Keys.onEnterPressed: win.launch(win.items[win.sel])
+                    Keys.onReturnPressed: e => win.launch(win.items[win.sel], e.modifiers & Qt.ShiftModifier)
+                    Keys.onEnterPressed: e => win.launch(win.items[win.sel], e.modifiers & Qt.ShiftModifier)
                 }
             }
 
