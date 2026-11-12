@@ -9,6 +9,7 @@ PanelWindow {
     id: bar
     required property var modelData
     signal quickClicked()
+    signal searchClicked()
     screen: modelData
     anchors { top: true; left: true; right: true }
     implicitHeight: 32
@@ -40,7 +41,7 @@ PanelWindow {
         anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
         spacing: 10
         Btn {
-            onClicked: Quickshell.execDetached(["fuzzel"]) // ponytail: fuzzel until Still's launcher (step 4)
+            onClicked: bar.searchClicked()
             Item { // search glyph: ring + handle
                 width: 15; height: 15
                 Rectangle { x: 1; y: 1; width: 10; height: 10; radius: 5; color: "transparent"; border { width: 2; color: Theme.ink } }

@@ -28,6 +28,10 @@ sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" 
     r'    Mod+P hotkey-overlay-title="Mirror to external screen" { spawn "mist-mirror"; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')
 sub(r'alacritty', 'ghostty')
+# Super+D opens Still's launcher; fuzzel stays on Super+Shift+D as a fallback while the launcher is new.
+sub(r'Mod\+D hotkey-overlay-title="Run an Application: fuzzel" \{ spawn "fuzzel"; \}',
+    'Mod+D hotkey-overlay-title="Search apps, files and settings" { spawn "sh" "-c" "qs ipc -p ~/.config/quickshell/still call launcher toggle"; }\n'
+    '    Mod+Shift+D hotkey-overlay-title="Run an Application: fuzzel (fallback)" { spawn "fuzzel"; }')
 # Lock through logind so hypridle runs hyprlock (fingerprint) for the key, idle and suspend alike.
 sub(r'"Lock the Screen: swaylock" \{ spawn "swaylock"; \}', '"Lock the Screen" { spawn "loginctl" "lock-session"; }')
 # Coucou's island (X11 via xwayland-satellite, GDK_BACKEND=x11) floats at the top, never tiled.

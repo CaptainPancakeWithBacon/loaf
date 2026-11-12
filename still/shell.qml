@@ -6,10 +6,22 @@ import QtQuick
 
 ShellRoot {
     QuickSettings { id: quick } // one card, opened on the screen whose bar was clicked
+    Launcher { id: launcher }
+
+    // the screen niri has focused, for windows opened by key instead of by click
+    function focusedScreen() {
+        const out = (Niri.workspaces.find(w => w.is_focused) || {}).output
+        return Quickshell.screens.find(s => s.name === out) || Quickshell.screens[0]
+    }
 
     IpcHandler { // qs ipc -p ~/.config/quickshell/still call quick toggle
         target: "quick"
         function toggle(): void { quick.open = !quick.open }
+    }
+    IpcHandler { // Super+D: qs ipc -p ~/.config/quickshell/still call launcher toggle
+        target: "launcher"
+        function toggle(): void { if (!launcher.open) launcher.screen = focusedScreen(); launcher.open = !launcher.open }
+        function search(q: string): void { launcher.screen = focusedScreen(); launcher.open = true; launcher.search(q) }
     }
 
     Variants {
@@ -26,6 +38,7 @@ ShellRoot {
             }
             Bar {
                 modelData: s.modelData
+                onSearchClicked: { launcher.screen = s.modelData; launcher.open = !launcher.open }
                 onQuickClicked: {
                     const same = quick.screen === s.modelData
                     quick.screen = s.modelData
