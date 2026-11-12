@@ -1,20 +1,35 @@
-# Mist: card on fog, ink text. Day palette; night is a later swap.
-font=Hanken Grotesk 11
-background-color=#F6F8F9
-text-color=#101418
-border-color=#DCE2E6
+# Still notifications: a sheet card like quick settings. Light (cream) by default; Still's
+# Theme.qml adds the mako mode "dark" when dark style is on. Event-driven, mako idles at 0.
+font=Inter 11
+background-color=#FBF8F1
+text-color=#151515
+border-color=#DED8CC
+progress-color=over #E9E4D9
 border-size=1
-border-radius=18
-padding=14,18
-margin=12
+border-radius=14
+padding=14,16
+margin=10,10
 width=360
+max-icon-size=40
 default-timeout=6000
 anchor=top-right
 layer=overlay
+format=<b>%s</b>\n%b
+
 [urgency=high]
-border-color=#101418
+border-color=#151515
 border-size=2
 default-timeout=0
 
+[mode=dark]
+background-color=#1C1C1B
+text-color=#ECECEA
+border-color=#2E2E2C
+progress-color=over #2A2A28
+
+[mode=dark urgency=high]
+border-color=#ECECEA
+
+# last, so it wins over everything above
 [mode=do-not-disturb]
 invisible=1

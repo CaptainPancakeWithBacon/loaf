@@ -8,6 +8,8 @@ import QtQuick
 Singleton {
     id: t
     property bool dark: false
+    // mako has no colour-scheme support: its config has a "dark" mode that we switch along
+    onDarkChanged: Quickshell.execDetached(["makoctl", "mode", dark ? "-a" : "-r", "dark"])
 
     readonly property color ground: dark ? "#121212" : "#F1EDE4"
     readonly property color sheet:  dark ? "#1C1C1B" : "#FBF8F1"
