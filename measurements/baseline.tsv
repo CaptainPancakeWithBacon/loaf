@@ -5,3 +5,5 @@ date	session	case	compositor	quickshell	xwayland	coucou	machine_busy	gpu_busy	wa
 2026-11-11 22:38	niri	no coucou	0.48	0.27	0.00	0.00	1.19	0.71	5.18	50	power-saver
 2026-11-11 22:44	niri	no coucou, no bar	0.37	0.00	0.00	0.00	0.78	0.98	4.98	50	power-saver
 2026-11-11 23:00	niri	coucou x11, floating	0.26	0.28	0.25	1.56	1.19	0.47	4.98	50	power-saver
+2026-11-12 14:17	niri	still bar (no coucou)	0.38	0.02	0.00	0.00	1.43	0.25	5.48	50	power-saver
+2026-11-12 14:22	niri	no coucou, no bar	0.37	0.00	0.00	0.00	1.42	0.14	5.48	50	power-saver

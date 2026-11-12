@@ -17,6 +17,7 @@ niri validate || { echo "niri config invalid"; exit 1; }
 link() { rm -rf "$2"; ln -s "$1" "$2"; }
 mkdir -p ~/.config/quickshell
 link "$here/quickshell"        ~/.config/quickshell/mist
+link "$here/still"             ~/.config/quickshell/still
 link "$here/mako"              ~/.config/mako
 link "$here/fuzzel"            ~/.config/fuzzel
 link "$here/swaylock"          ~/.config/swaylock

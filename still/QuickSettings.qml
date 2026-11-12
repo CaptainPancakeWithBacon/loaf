@@ -1,0 +1,1 @@
+../quickshell/QuickSettings.qml

@@ -10,9 +10,13 @@ def sub(pattern, repl, flags=0):
     if n != 1:
         sys.exit(f"no match for: {pattern}")
 
+# Still draws its own ground (follows dark style), so no swaybg.
 sub(r'spawn-at-startup "waybar"',
-    'spawn-at-startup "swaybg" "-c" "#DDE2E6"\n'
-    'spawn-at-startup "sh" "-c" "mkdir -p ~/.cache/niri-mist && exec qs -p ~/.config/quickshell/mist > ~/.cache/niri-mist/qs.log 2>&1"')
+    'spawn-at-startup "sh" "-c" "mkdir -p ~/.cache/still && exec qs -p ~/.config/quickshell/still > ~/.cache/still/qs.log 2>&1"\n'
+    # GNOME Settings' Bluetooth page asks gsd-rfkill, which only GNOME starts. Drop once Still's quick settings do BT.
+    'spawn-at-startup "/usr/libexec/gsd-rfkill"\n'
+    # Apps keep their stock look in niri: drop Isobar's import (Isobar adds it back when GNOME starts).
+    'spawn-at-startup "sh" "-c" "sed -i \'/@import url(\\"mist.css\\");/d\' ~/.config/gtk-4.0/gtk.css"')
 sub(r'gaps 16', 'gaps 14')
 sub(r'active-color "#7fc8ff"', 'active-color "#101418"')
 sub(r'inactive-color "#505050"', 'inactive-color "#C6CFD6"')
