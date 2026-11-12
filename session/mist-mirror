@@ -2,6 +2,14 @@
 # Super+P: mirror the laptop screen fullscreen onto the first external screen; press again to stop.
 # niri has no built-in mirroring (niri FAQ), wl-mirror is the documented workaround.
 pkill -x wl-mirror && exit 0
-target=$(niri msg --json outputs | python3 -c 'import json,sys; o=[n for n in json.load(sys.stdin) if not n.startswith("eDP")]; print(o[0] if o else "")')
-[ -n "$target" ] || { notify-send "Mirror" "No external screen connected"; exit 1; }
-exec wl-mirror --fullscreen-output "$target" eDP-1
+pick=$(niri msg --json outputs | python3 -c '
+import json, sys
+o = json.load(sys.stdin)
+lap = o.get("eDP-1")
+ext = [n for n in o if not n.startswith("eDP") and o[n].get("current_mode") is not None]
+print("off" if not lap or lap.get("current_mode") is None else (ext[0] if ext else ""))')
+case "$pick" in
+  off) notify-send "Mirror" "The laptop screen is off (lid closed), so there is nothing to mirror"; exit 1 ;;
+  "") notify-send "Mirror" "No external screen connected"; exit 1 ;;
+esac
+exec wl-mirror --fullscreen-output "$pick" eDP-1

@@ -1,4 +1,4 @@
-// Still design tokens, taken from Personal/Still/demo/still-demo.html (:root and dark set).
+// Still design tokens (light set: warm cream, chosen 2026-11-12), based on Personal/Still/demo/still-demo.html (:root and dark set).
 // Dark follows org.gnome.desktop.interface color-scheme, so GTK/libadwaita apps switch with it.
 pragma Singleton
 import Quickshell
@@ -9,15 +9,16 @@ Singleton {
     id: t
     property bool dark: false
 
-    readonly property color ground: dark ? "#121212" : "#E9E9E5"
-    readonly property color sheet:  dark ? "#1C1C1B" : "#FFFFFF"
-    readonly property color soft:   dark ? "#222221" : "#F2F2EF"
-    readonly property color line:   dark ? "#2E2E2C" : "#DEDED9"
+    readonly property color ground: dark ? "#121212" : "#F1EDE4"
+    readonly property color sheet:  dark ? "#1C1C1B" : "#FBF8F1"
+    readonly property color soft:   dark ? "#222221" : "#F4F0E8"
+    readonly property color line:   dark ? "#2E2E2C" : "#DED8CC"
     readonly property color ink:    dark ? "#ECECEA" : "#151515"
-    readonly property color mute:   dark ? "#A3A39E" : "#6B6B66"
-    readonly property color faint:  dark ? "#5A5A57" : "#9C9C96"
-    readonly property color fill:   dark ? "#2A2A28" : "#ECECE8"
-    readonly property color onInk:  dark ? "#121212" : "#FFFFFF"
+    readonly property color mute:   dark ? "#A3A39E" : "#6E6A62"
+    readonly property color faint:  dark ? "#5A5A57" : "#A09A8F"
+    readonly property color fill:   dark ? "#2A2A28" : "#E9E4D9"
+    // text on an ink surface (not "onInk": QML reads on+Capital as a signal handler)
+    readonly property color inverse: dark ? "#121212" : "#FBF8F1"
 
     // ponytail: Instrument Sans is not installed; Inter until the font is added
     readonly property string sans: "Inter"

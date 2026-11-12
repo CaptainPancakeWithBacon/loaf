@@ -1,12 +1,15 @@
 // Still: ground + bar on every screen. Screens come and go with the dock; Variants follows them.
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Io
 import QtQuick
 
 ShellRoot {
-    QuickSettings { // ponytail: niri-mist's card (symlink) until Still's quick settings (step 3)
-        id: quick
-        palette: ({ ink: Theme.ink, slate: Theme.mute, mute: Theme.faint, bg: Theme.sheet })
+    QuickSettings { id: quick } // one card, opened on the screen whose bar was clicked
+
+    IpcHandler { // qs ipc -p ~/.config/quickshell/still call quick toggle
+        target: "quick"
+        function toggle(): void { quick.open = !quick.open }
     }
 
     Variants {
@@ -21,7 +24,14 @@ ShellRoot {
                 anchors { top: true; bottom: true; left: true; right: true }
                 color: Theme.ground
             }
-            Bar { modelData: s.modelData; onQuickClicked: quick.open = !quick.open }
+            Bar {
+                modelData: s.modelData
+                onQuickClicked: {
+                    const same = quick.screen === s.modelData
+                    quick.screen = s.modelData
+                    quick.open = !(quick.open && same)
+                }
+            }
         }
     }
 }
