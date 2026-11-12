@@ -7,6 +7,8 @@ import QtQuick
 ShellRoot {
     QuickSettings { id: quick } // one card, opened on the screen whose bar was clicked
     Launcher { id: launcher }
+    Lock { id: stillLock }
+    Timer { id: safety; interval: 45000; onTriggered: stillLock.done() } // only armed by "lock test"
 
     // the screen niri has focused, for windows opened by key instead of by click
     function focusedScreen() {
@@ -17,6 +19,11 @@ ShellRoot {
     IpcHandler { // qs ipc -p ~/.config/quickshell/still call quick toggle
         target: "quick"
         function toggle(): void { quick.open = !quick.open }
+    }
+    IpcHandler { // hypridle: qs ipc -p ~/.config/quickshell/still call lock lock
+        target: "lock"
+        function lock(): void { stillLock.lock() }
+        function test(): void { stillLock.lock(); safety.restart() } // unlocks itself after 45 s, for trying it out
     }
     IpcHandler { // Super+D: qs ipc -p ~/.config/quickshell/still call launcher toggle
         target: "launcher"
