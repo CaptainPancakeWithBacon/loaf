@@ -49,4 +49,23 @@ window-rule {
     shadow { off; }
 }
 '''
+# Games started through Proton/umu (Lutris, Steam) open fullscreen instead of as a tiled column.
+# Leave with Super+Shift+F; the game keeps running on its own column.
+src += '''
+window-rule {
+    match app-id="^steam_app_"
+    open-fullscreen true
+}
+'''
+# The desk screens run at 144 Hz (their preferred mode is 60). niri only matches a screen by connector or by
+# its full "Make Model Serial" name, and the dock hands out different connectors, so the names live in a local
+# file outside the repo: ~/.config/loaf/144hz-outputs, one name per line. Docked means charging, no battery cost.
+_hz = os.path.expanduser("~/.config/loaf/144hz-outputs")
+for _name in (open(_hz).read().splitlines() if os.path.exists(_hz) else []):
+    if _name.strip():
+        src += f'''
+output "{_name.strip()}" {{
+    mode "2560x1440@144.001"
+}}
+'''
 open(sys.argv[2], "w").write(src)
