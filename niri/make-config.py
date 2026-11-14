@@ -36,6 +36,13 @@ sub(r'Mod\+D hotkey-overlay-title="Run an Application: fuzzel" \{ spawn "fuzzel"
     '    Mod+Shift+D hotkey-overlay-title="Run an Application: fuzzel (fallback)" { spawn "fuzzel"; }')
 # Lock through logind so hypridle runs hyprlock (fingerprint) for the key, idle and suspend alike.
 sub(r'"Lock the Screen: swaylock" \{ spawn "swaylock"; \}', '"Lock the Screen" { spawn "loginctl" "lock-session"; }')
+# Volume keys also show Still's OSD. Brightness goes through logind (brightnessctl needs root or the video group).
+osd = '; qs ipc -p ~/.config/quickshell/still call osd volume'
+sub(r'(wpctl set-volume @DEFAULT_AUDIO_SINK@ 0\.1\+ -l 1\.0)"', r'\1' + osd + '"')
+sub(r'(wpctl set-volume @DEFAULT_AUDIO_SINK@ 0\.1-)"', r'\1' + osd + '"')
+sub(r'(wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle)"', r'\1' + osd + '"')
+sub(r'spawn "brightnessctl" "--class=backlight" "set" "\+10%"', 'spawn "still-brightness" "+10"')
+sub(r'spawn "brightnessctl" "--class=backlight" "set" "10%-"', 'spawn "still-brightness" "-10"')
 # Coucou's island (X11 via xwayland-satellite, GDK_BACKEND=x11) floats at the top, never tiled.
 # Native Wayland Coucou idled at 23% of a core here; X11 + floating at 1.6% (measurements/baseline.tsv).
 src += '''

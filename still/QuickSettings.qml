@@ -252,7 +252,7 @@ PanelWindow {
             }
             Slider {
                 label: "Brightness"; minimum: 0.05; value: win.bright / 100
-                onMoved: v => { win.bright = Math.round(v * 100); win.run(["brightnessctl", "-q", "--class=backlight", "set", win.bright + "%"]) }
+                onMoved: v => { win.bright = Math.round(v * 100); win.run(["still-brightness", String(win.bright), "--no-osd"]) }
             }
         }
     }

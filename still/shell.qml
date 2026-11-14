@@ -8,6 +8,7 @@ ShellRoot {
     QuickSettings { id: quick } // one card, opened on the screen whose bar was clicked
     Launcher { id: launcher }
     Lock { id: stillLock }
+    Osd { id: osd }
     Timer { id: safety; interval: 45000; onTriggered: stillLock.done() } // only armed by "lock test"
 
     // the screen niri has focused, for windows opened by key instead of by click
@@ -25,6 +26,11 @@ ShellRoot {
         target: "lock"
         function lock(): void { stillLock.lock() }
         function test(): void { stillLock.lock(); safety.restart() } // unlocks itself after 45 s, for trying it out
+    }
+    IpcHandler { // volume and brightness keys: qs ipc -p ~/.config/quickshell/still call osd volume | brightness 40
+        target: "osd"
+        function volume(): void { osd.screen = focusedScreen(); osd.flash("volume") }
+        function brightness(pct: int): void { osd.bright = pct; osd.screen = focusedScreen(); osd.flash("brightness") }
     }
     IpcHandler { // Super+D: qs ipc -p ~/.config/quickshell/still call launcher toggle
         target: "launcher"
