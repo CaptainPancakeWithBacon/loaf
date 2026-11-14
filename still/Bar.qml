@@ -66,10 +66,11 @@ PanelWindow {
         }
     }
 
-    Label {
+    Row { // date, quiet, next to the time; the minute tick also rolls the date over at midnight
         anchors.centerIn: parent
-        text: Qt.formatTime(clock.date, "HH:mm")
-        font.weight: Font.Medium
+        spacing: 8
+        Label { text: Qt.formatDate(clock.date, "ddd d MMM"); color: Theme.mute }
+        Label { text: Qt.formatTime(clock.date, "HH:mm"); font.weight: Font.Medium }
     }
 
     Btn {

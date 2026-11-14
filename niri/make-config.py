@@ -25,7 +25,9 @@ sub(r'/-window-rule \{(\s*)geometry-corner-radius 12', r'window-rule {\1geometry
 sub(r'(\nhotkey-overlay \{)', r'\nprefer-no-csd\n\1')
 sub(r'(hotkey-overlay \{)', r'\1\n    skip-at-startup')
 sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" { spawn "mist-power"; }\n'
-    r'    Mod+P hotkey-overlay-title="Mirror to external screen" { spawn "mist-mirror"; }\n')
+    r'    Mod+P hotkey-overlay-title="Mirror to external screen" { spawn "mist-mirror"; }\n'
+    # Gijs reaches for the GNOME/Windows key; Print, Ctrl+Print and Alt+Print stay as niri ships them.
+    r'    Mod+Shift+S hotkey-overlay-title="Screenshot: select an area" { screenshot; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')
 sub(r'alacritty', 'ghostty')
 # Super+D opens Still's launcher; fuzzel stays on Super+Shift+D as a fallback while the launcher is new.

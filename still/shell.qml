@@ -19,6 +19,7 @@ ShellRoot {
     IpcHandler { // qs ipc -p ~/.config/quickshell/still call quick toggle
         target: "quick"
         function toggle(): void { quick.open = !quick.open }
+        function list(which: string): void { quick.open = true; quick.detail = which } // "bt", "wifi" or ""; not named "show": qs ipc reads that as its own subcommand
     }
     IpcHandler { // hypridle: qs ipc -p ~/.config/quickshell/still call lock lock
         target: "lock"

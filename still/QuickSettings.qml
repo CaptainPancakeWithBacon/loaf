@@ -15,8 +15,17 @@ PanelWindow {
     id: win
     property bool open: false
     property bool powerMenu: false
+    property string detail: "" // "", "bt" or "wifi": the list under the tiles (right-click a tile, or its arrow)
     visible: open
-    onOpenChanged: if (open) { powerMenu = false; brightRead.running = true; dndRead.running = true }
+    onOpenChanged: { scan(); if (open) { powerMenu = false; detail = ""; brightRead.running = true; dndRead.running = true } }
+    onDetailChanged: scan()
+    // Wi-Fi scanning costs power: only while the network list is on screen
+    function scan() { if (wifiDev) wifiDev.scannerEnabled = open && detail === "wifi" }
+    function settings(panel) { open = false; run(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", panel]) }
+    readonly property var btList: bt ? bt.devices.values.filter(d => d.paired || d.connected)
+        .sort((a, b) => (b.connected - a.connected) || a.name.localeCompare(b.name)) : []
+    readonly property var wifiList: wifiDev ? wifiDev.networks.values.slice()
+        .sort((a, b) => (b.connected - a.connected) || (b.known - a.known) || (b.signalStrength - a.signalStrength)).slice(0, 6) : []
 
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
@@ -65,15 +74,43 @@ PanelWindow {
     component Tile: Rectangle {
         id: t
         property string title; property string sub; property bool on
+        property bool hasMore: false
         signal toggled()
+        signal more()
         height: 56; radius: 14
         color: on ? Theme.ink : (area.containsMouse ? Theme.line : Theme.fill)
         Column {
             anchors { left: parent.left; leftMargin: 14; verticalCenter: parent.verticalCenter }
-            Text { text: t.title; color: t.on ? Theme.inverse : Theme.ink; font { family: Theme.sans; pixelSize: 14; weight: Font.DemiBold } }
-            Text { text: t.sub; color: t.on ? Theme.inverse : Theme.mute; opacity: t.on ? 0.75 : 1; font { family: Theme.sans; pixelSize: 12 } }
+            width: t.width - 28 - (t.hasMore ? 20 : 0)
+            Text { width: parent.width; elide: Text.ElideRight; text: t.title; color: t.on ? Theme.inverse : Theme.ink; font { family: Theme.sans; pixelSize: 14; weight: Font.DemiBold } }
+            Text { width: parent.width; elide: Text.ElideRight; text: t.sub; color: t.on ? Theme.inverse : Theme.mute; opacity: t.on ? 0.75 : 1; font { family: Theme.sans; pixelSize: 12 } }
         }
-        MouseArea { id: area; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: t.toggled() }
+        Text { // arrow: this tile has a list
+            visible: t.hasMore; text: "›"
+            anchors { right: parent.right; rightMargin: 14; verticalCenter: parent.verticalCenter }
+            color: t.on ? Theme.inverse : Theme.mute; font { family: Theme.sans; pixelSize: 20 }
+        }
+        MouseArea {
+            id: area; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: m => (m.button === Qt.RightButton || (t.hasMore && m.x > width - 40)) ? t.more() : t.toggled()
+        }
+    }
+    component Line: Rectangle {
+        id: l
+        property string label; property string hint; property bool strong
+        signal clicked()
+        width: parent.width; height: 38; radius: 10
+        color: la.containsMouse ? Theme.fill : "transparent"
+        Text {
+            x: 12; anchors.verticalCenter: parent.verticalCenter; width: parent.width - 32 - lh.width; elide: Text.ElideRight
+            text: l.label; color: Theme.ink; font { family: Theme.sans; pixelSize: 14; weight: l.strong ? Font.DemiBold : Font.Normal }
+        }
+        Text {
+            id: lh; anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+            text: l.hint; color: Theme.mute; font { family: Theme.sans; pixelSize: 12 }
+        }
+        MouseArea { id: la; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: l.clicked() }
     }
     component Slider: Column {
         id: s
@@ -146,11 +183,13 @@ PanelWindow {
                     width: parent.w; title: "Wi-Fi"; on: Networking.wifiEnabled
                     sub: !Networking.wifiEnabled ? "Off" : (win.wifiNet ? win.wifiNet.name : "Not connected")
                     onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
+                    hasMore: true; onMore: win.detail = win.detail === "wifi" ? "" : "wifi"
                 }
                 Tile {
                     width: parent.w; title: "Bluetooth"; on: !!win.bt && win.bt.enabled
                     sub: !on ? "Off" : (win.btDevice ? win.btDevice.name : "On")
                     onToggled: if (win.bt) win.bt.enabled = !win.bt.enabled
+                    hasMore: true; onMore: win.detail = win.detail === "bt" ? "" : "bt"
                 }
                 Tile {
                     width: parent.w; title: "Power saver"; on: PowerProfiles.profile === PowerProfile.PowerSaver
@@ -171,6 +210,39 @@ PanelWindow {
                     width: parent.w; title: "Screen"; on: mirror.running
                     sub: on ? "Mirroring" : "Extend"
                     onToggled: mirror.running = !mirror.running
+                }
+            }
+
+            Column { // device or network list for the tile that was right-clicked
+                visible: win.detail !== ""; width: parent.width; spacing: 2
+                Text {
+                    leftPadding: 12; bottomPadding: 4
+                    text: win.detail === "bt" ? "Bluetooth devices" : "Wi-Fi networks"
+                    color: Theme.mute; font { family: Theme.sans; pixelSize: 12 }
+                }
+                Repeater {
+                    model: win.detail === "bt" ? win.btList : []
+                    Line {
+                        required property var modelData
+                        label: modelData.name; strong: modelData.connected
+                        hint: (modelData.state === BluetoothDeviceState.Connecting ? "Connecting" : modelData.state === BluetoothDeviceState.Disconnecting ? "Disconnecting" : modelData.connected ? "Connected" : "")
+                            + (modelData.connected && modelData.batteryAvailable ? " · " + Math.round(modelData.battery <= 1 ? modelData.battery * 100 : modelData.battery) + "%" : "")
+                        onClicked: modelData.connected ? modelData.disconnect() : modelData.connect()
+                    }
+                }
+                Repeater {
+                    model: win.detail === "wifi" ? win.wifiList : []
+                    Line {
+                        required property var modelData
+                        label: modelData.name; strong: modelData.connected
+                        hint: modelData.stateChanging ? "Connecting" : modelData.connected ? "Connected" : modelData.known ? "Saved" : ""
+                        // a new network needs its password typed: that stays in Settings
+                        onClicked: modelData.connected ? modelData.disconnect() : modelData.known ? modelData.connect() : win.settings("wifi")
+                    }
+                }
+                Line {
+                    label: win.detail === "bt" ? "Pair a new device…" : "Wi-Fi settings…"
+                    onClicked: win.settings(win.detail === "bt" ? "bluetooth" : "wifi")
                 }
             }
 
