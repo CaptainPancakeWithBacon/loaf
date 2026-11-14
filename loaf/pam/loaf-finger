@@ -1,0 +1,2 @@
+# Loaf lock: fingerprint only (runs next to loaf-password). 300 s per round, the lock restarts it.
+auth required pam_fprintd.so max-tries=3 timeout=300

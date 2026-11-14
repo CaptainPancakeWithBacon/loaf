@@ -1,4 +1,4 @@
-// Still launcher: one search over apps, settings and files (layout from the demo's .launcher).
+// Loaf launcher: one search over apps, settings and files (layout from the demo's .launcher).
 // Apps come from Quickshell's desktop entries, files from GNOME's indexer (localsearch, only while
 // typing), settings open GNOME Settings panels. Up/Down choose, Enter opens, Esc closes.
 import Quickshell

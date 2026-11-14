@@ -1,6 +1,6 @@
 // node tests/bring-back.test.js : checks Niri.qml's windowToBringBack (pulled out of the QML file).
 const fs = require("fs"), assert = require("assert")
-const src = fs.readFileSync(__dirname + "/../still/Niri.qml", "utf8")
+const src = fs.readFileSync(__dirname + "/../loaf/Niri.qml", "utf8")
 const fn = new Function("return " + src.match(/function windowToBringBack[\s\S]*?\n    }/)[0])()
 const ws = (id, output, extra = {}) => ({ id, idx: 1, output, is_active: true, is_focused: false, active_window_id: null, ...extra })
 

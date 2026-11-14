@@ -1,4 +1,4 @@
-# Still notifications: a sheet card like quick settings. Light (cream) by default; Still's
+# Loaf notifications: a sheet card like quick settings. Light (cream) by default; Loaf's
 # Theme.qml adds the mako mode "dark" when dark style is on. Event-driven, mako idles at 0.
 font=Inter 11
 background-color=#FBF8F1

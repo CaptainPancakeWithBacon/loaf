@@ -1,5 +1,5 @@
-// Still quick settings: battery and watts, power menu, six tiles, volume and brightness.
-// Layout from Personal/Still/demo/still-demo.html (.quick). Everything reads services that push
+// Loaf quick settings: battery and watts, power menu, six tiles, volume and brightness.
+// Layout from Personal/Loaf/demo/still-demo.html (.quick). Everything reads services that push
 // changes (UPower, NetworkManager, BlueZ, PipeWire, power-profiles-daemon); nothing polls.
 // Brightness and do-not-disturb have no event source, so they are read when the card opens.
 import Quickshell
@@ -252,7 +252,7 @@ PanelWindow {
             }
             Slider {
                 label: "Brightness"; minimum: 0.05; value: win.bright / 100
-                onMoved: v => { win.bright = Math.round(v * 100); win.run(["still-brightness", String(win.bright), "--no-osd"]) }
+                onMoved: v => { win.bright = Math.round(v * 100); win.run(["loaf-brightness", String(win.bright), "--no-osd"]) }
             }
         }
     }

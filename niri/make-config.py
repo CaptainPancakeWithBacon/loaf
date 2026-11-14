@@ -10,9 +10,9 @@ def sub(pattern, repl, flags=0):
     if n != 1:
         sys.exit(f"no match for: {pattern}")
 
-# Still draws its own ground (follows dark style), so no swaybg.
+# Loaf draws its own ground (follows dark style), so no swaybg.
 sub(r'spawn-at-startup "waybar"',
-    'spawn-at-startup "sh" "-c" "mkdir -p ~/.cache/still && exec qs -p ~/.config/quickshell/still > ~/.cache/still/qs.log 2>&1"\n'
+    'spawn-at-startup "sh" "-c" "mkdir -p ~/.cache/loaf && exec qs -p ~/.config/quickshell/loaf > ~/.cache/loaf/qs.log 2>&1"\n'
     # GNOME Settings' Bluetooth page (pairing new devices) asks gsd-rfkill, which only GNOME starts. Costs ~0 CPU.
     'spawn-at-startup "/usr/libexec/gsd-rfkill"\n'
     # Apps keep their stock look in niri: drop Isobar's import (Isobar adds it back when GNOME starts).
@@ -30,19 +30,19 @@ sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" 
     r'    Mod+Shift+S hotkey-overlay-title="Screenshot: select an area" { screenshot; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')
 sub(r'alacritty', 'ghostty')
-# Super+D opens Still's launcher; fuzzel stays on Super+Shift+D as a fallback while the launcher is new.
+# Super+D opens Loaf's launcher; fuzzel stays on Super+Shift+D as a fallback while the launcher is new.
 sub(r'Mod\+D hotkey-overlay-title="Run an Application: fuzzel" \{ spawn "fuzzel"; \}',
-    'Mod+D hotkey-overlay-title="Search apps, files and settings" { spawn "sh" "-c" "qs ipc -p ~/.config/quickshell/still call launcher toggle"; }\n'
+    'Mod+D hotkey-overlay-title="Search apps, files and settings" { spawn "sh" "-c" "qs ipc -p ~/.config/quickshell/loaf call launcher toggle"; }\n'
     '    Mod+Shift+D hotkey-overlay-title="Run an Application: fuzzel (fallback)" { spawn "fuzzel"; }')
 # Lock through logind so hypridle runs hyprlock (fingerprint) for the key, idle and suspend alike.
 sub(r'"Lock the Screen: swaylock" \{ spawn "swaylock"; \}', '"Lock the Screen" { spawn "loginctl" "lock-session"; }')
-# Volume keys also show Still's OSD. Brightness goes through logind (brightnessctl needs root or the video group).
-osd = '; qs ipc -p ~/.config/quickshell/still call osd volume'
+# Volume keys also show Loaf's OSD. Brightness goes through logind (brightnessctl needs root or the video group).
+osd = '; qs ipc -p ~/.config/quickshell/loaf call osd volume'
 sub(r'(wpctl set-volume @DEFAULT_AUDIO_SINK@ 0\.1\+ -l 1\.0)"', r'\1' + osd + '"')
 sub(r'(wpctl set-volume @DEFAULT_AUDIO_SINK@ 0\.1-)"', r'\1' + osd + '"')
 sub(r'(wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle)"', r'\1' + osd + '"')
-sub(r'spawn "brightnessctl" "--class=backlight" "set" "\+10%"', 'spawn "still-brightness" "+10"')
-sub(r'spawn "brightnessctl" "--class=backlight" "set" "10%-"', 'spawn "still-brightness" "-10"')
+sub(r'spawn "brightnessctl" "--class=backlight" "set" "\+10%"', 'spawn "loaf-brightness" "+10"')
+sub(r'spawn "brightnessctl" "--class=backlight" "set" "10%-"', 'spawn "loaf-brightness" "-10"')
 # Coucou's island (X11 via xwayland-satellite, GDK_BACKEND=x11) floats at the top, never tiled.
 # Native Wayland Coucou idled at 23% of a core here; X11 + floating at 1.6% (measurements/baseline.tsv).
 src += '''

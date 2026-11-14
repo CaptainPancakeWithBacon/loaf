@@ -1,6 +1,6 @@
 #!/bin/sh
 # Screen brightness without root: logind's SetBrightness (brightnessctl only writes as root or in the video group).
-# still-brightness +10 | -10 | 40 [--no-osd]   (percent, relative or absolute; never below 5% so the screen stays visible)
+# loaf-brightness +10 | -10 | 40 [--no-osd]   (percent, relative or absolute; never below 5% so the screen stays visible)
 d=$(ls /sys/class/backlight | head -n1)
 [ -n "$d" ] || exit 1
 b=/sys/class/backlight/$d
@@ -11,5 +11,5 @@ case $1 in +*|-*) pct=$((pct + $1)) ;; *) pct=$1 ;; esac
 [ "$pct" -gt 100 ] && pct=100
 busctl call org.freedesktop.login1 /org/freedesktop/login1/session/auto org.freedesktop.login1.Session \
     SetBrightness ssu backlight "$d" $((max * pct / 100))
-[ "$2" = --no-osd ] || qs ipc -p ~/.config/quickshell/still call osd brightness "$pct" >/dev/null 2>&1
+[ "$2" = --no-osd ] || qs ipc -p ~/.config/quickshell/loaf call osd brightness "$pct" >/dev/null 2>&1
 exit 0

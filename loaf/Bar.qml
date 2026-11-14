@@ -1,4 +1,4 @@
-// Still bar, one per screen: search, workspace dots | clock | wifi, watts, battery.
+// Loaf bar, one per screen: search, workspace dots | clock | wifi, watts, battery.
 // Idle rules: clock ticks per minute (SystemClock), everything else follows events.
 import Quickshell
 import Quickshell.Networking
@@ -42,10 +42,10 @@ PanelWindow {
         spacing: 10
         Btn {
             onClicked: bar.searchClicked()
-            Item { // search glyph: ring + handle
-                width: 15; height: 15
-                Rectangle { x: 1; y: 1; width: 10; height: 10; radius: 5; color: "transparent"; border { width: 2; color: Theme.ink } }
-                Rectangle { x: 10; y: 11; width: 5; height: 2; radius: 1; rotation: 45; color: Theme.ink }
+            Image { // the Loaf cat opens the launcher (small cut: no eyes at this size)
+                width: 18; height: 18
+                sourceSize { width: 36; height: 36 }
+                source: Theme.logo("mark-small")
             }
         }
         Row {

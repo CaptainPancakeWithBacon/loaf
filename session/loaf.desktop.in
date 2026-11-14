@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Loaf
+Comment=Low-power desktop on niri
+Exec=@HOME@/.local/bin/loaf-session
+Type=Application
+DesktopNames=niri

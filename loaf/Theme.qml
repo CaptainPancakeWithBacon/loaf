@@ -1,4 +1,4 @@
-// Still design tokens (light set: warm cream, chosen 2026-11-12), based on Personal/Still/demo/still-demo.html (:root and dark set).
+// Loaf design tokens (light set: warm cream, chosen 2026-11-12), based on Personal/Loaf/demo/still-demo.html (:root and dark set).
 // Dark follows org.gnome.desktop.interface color-scheme, so GTK/libadwaita apps switch with it.
 pragma Singleton
 import Quickshell
@@ -26,6 +26,9 @@ Singleton {
     readonly property string sans: "Inter"
     readonly property string mono: "JetBrains Mono"
     readonly property int radius: 14
+
+    // Loaf logo files (assets/, from the brand kit): mark, mark-small (24 px and below), wordmark
+    function logo(name) { return Qt.resolvedUrl("assets/" + name + (dark ? "-dark" : "-light") + ".svg") }
 
     function setDark(on) {
         Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", on ? "prefer-dark" : "default"])

@@ -1,6 +1,6 @@
-// Still lock screen (layout from the demo's .lock): big clock, date, fingerprint circle, password field,
+// Loaf lock screen (layout from the demo's .lock): big clock, date, fingerprint circle, password field,
 // on every screen. Two PAM conversations run side by side, so a finger or a password unlocks, whichever
-// comes first (pam/still-finger, pam/still-password). niri keeps the session locked if this process dies;
+// comes first (pam/loaf-finger, pam/loaf-password). niri keeps the session locked if this process dies;
 // hypridle then falls back to hyprlock (see hypr/hypridle.conf).
 import Quickshell
 import Quickshell.Wayland
@@ -36,6 +36,12 @@ Scope {
         WlSessionLockSurface {
             color: Theme.soft
             SystemClock { id: clock; precision: SystemClock.Minutes }
+            Image { // quiet wordmark at the bottom
+                anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 36 }
+                width: 66; height: 34
+                sourceSize { width: 132; height: 68 }
+                source: Theme.logo("wordmark")
+            }
 
             Column {
                 anchors.centerIn: parent
@@ -44,6 +50,12 @@ Scope {
                 Column {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 8
+                    Image { // the Loaf cat, asleep, like the laptop
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: 64; height: 64
+                        sourceSize { width: 128; height: 128 }
+                        source: Theme.logo("mark")
+                    }
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatTime(clock.date, "HH:mm"); color: Theme.ink
@@ -104,7 +116,7 @@ Scope {
     // Finger: restarts after a timeout or 3 misses for as long as the screen is locked.
     PamContext {
         id: finger
-        configDirectory: root.pamDir; config: "still-finger"
+        configDirectory: root.pamDir; config: "loaf-finger"
         onPamMessage: if (message && !root.busy) { root.message = message.includes("finger") ? "Touch the sensor or type your password" : message; root.error = messageIsError }
         onCompleted: result => {
             if (result === PamResult.Success) root.done()
@@ -117,7 +129,7 @@ Scope {
     // Password: started when Enter is pressed, answers PAM's prompt with what was typed.
     PamContext {
         id: password
-        configDirectory: root.pamDir; config: "still-password"
+        configDirectory: root.pamDir; config: "loaf-password"
         onResponseRequiredChanged: if (responseRequired) { respond(root.pending); root.pending = "" }
         onCompleted: result => {
             root.busy = false

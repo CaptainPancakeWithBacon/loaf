@@ -1,5 +1,5 @@
 #!/bin/sh
-# Login entry for the niri + Mist session. GNOME stays untouched.
+# Login entry for Loaf (niri + the Loaf shell). GNOME stays untouched.
 # niri must run as niri.service so graphical-session.target is active; without it
 # xdg-desktop-portal-gnome fails its dependency and every portal call times out.
 export PATH="$HOME/.local/bin:$PATH"

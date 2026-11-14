@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <title>Loaf</title>
+  <!-- Front-view cat loaf, asleep. Symmetric about x=128, footprint 44-212 both ways. Eyes: crescents cut out, 10 units thick. -->
+  <path fill="#151515" fill-rule="evenodd" d="M44 200 L44 142 A84 84 0 0 1 66 86 L66 42 L104 64 A84 84 0 0 1 152 64 L190 42 L190 86 A84 84 0 0 1 212 142 L212 200 A12 12 0 0 1 200 212 L56 212 A12 12 0 0 1 44 200 Z M78 134 A18 18 0 0 0 114 134 A18 8 0 0 1 78 134 Z M142 134 A18 18 0 0 0 178 134 A18 8 0 0 1 142 134 Z"/>
+</svg>

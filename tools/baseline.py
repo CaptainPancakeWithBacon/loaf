@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Idle power baseline for Still (plan section 5). Stdlib only, no sudo.
+"""Idle power baseline for Loaf (plan section 5). Stdlib only, no sudo.
 
 Measures, in the session it runs in:
   1. as is (Coucou running)
@@ -9,8 +9,8 @@ Frozen processes are always resumed (SIGCONT), brightness and power profile rest
 
 Usage: tools/baseline.py [seconds_per_case=300] [settle=60]
 Run it detached so the Claude window is idle, with the screen kept on:
-  systemd-run --user --on-active=20 --unit=still-baseline \
-      systemd-inhibit --what=idle:sleep:handle-lid-switch --who=still --why=baseline \
+  systemd-run --user --on-active=20 --unit=loaf-baseline \
+      systemd-inhibit --what=idle:sleep:handle-lid-switch --who=loaf --why=baseline \
       ~/Documents/De-Werkplaats/personal/niri-mist/tools/baseline.py
 (in GNOME use gnome-session-inhibit --inhibit idle:suspend instead of systemd-inhibit)
 Results are appended to measurements/baseline.tsv.

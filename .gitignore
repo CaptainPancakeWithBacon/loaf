@@ -1,6 +1,6 @@
 src/
 test/
-session/niri-mist.desktop
+session/loaf.desktop
 niri/config.kdl
 *.log
 .omc/

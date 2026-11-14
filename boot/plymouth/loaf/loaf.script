@@ -1,0 +1,23 @@
+# Loaf boot screen: Night (#121212) with the sleeping cat in the middle. No animation.
+Window.SetBackgroundTopColor(0.071, 0.071, 0.071);
+Window.SetBackgroundBottomColor(0.071, 0.071, 0.071);
+
+logo.image = Image("mark.png");
+logo.sprite = Sprite(logo.image);
+
+fun place() {
+    logo.sprite.SetX(Window.GetX() + Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
+    logo.sprite.SetY(Window.GetY() + Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
+}
+place();
+Plymouth.SetRefreshFunction(place);
+
+# Messages (e.g. a disk check) go under the cat, quietly.
+message.sprite = Sprite();
+fun show_message(text) {
+    message.image = Image.Text(text, 0.64, 0.64, 0.62);
+    message.sprite.SetImage(message.image);
+    message.sprite.SetX(Window.GetX() + Window.GetWidth() / 2 - message.image.GetWidth() / 2);
+    message.sprite.SetY(Window.GetY() + Window.GetHeight() / 2 + logo.image.GetHeight());
+}
+Plymouth.SetMessageFunction(show_message);

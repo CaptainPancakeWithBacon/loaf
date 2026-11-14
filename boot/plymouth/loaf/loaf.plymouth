@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Loaf
+Description=Loaf boot screen: the sleeping cat on Night, nothing moves
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/loaf
+ScriptFile=/usr/share/plymouth/themes/loaf/loaf.script

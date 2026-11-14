@@ -1,5 +1,5 @@
-// Still OSD: a small card at the bottom of the screen when volume or brightness changes by key.
-// The key binds call it over IPC (wpctl, still-brightness); it hides after 1.5 s. Nothing runs at rest.
+// Loaf OSD: a small card at the bottom of the screen when volume or brightness changes by key.
+// The key binds call it over IPC (wpctl, loaf-brightness); it hides after 1.5 s. Nothing runs at rest.
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Pipewire
@@ -24,7 +24,7 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-    WlrLayershell.namespace: "still-osd"
+    WlrLayershell.namespace: "loaf-osd"
     mask: Region {} // clicks go through to the window below
 
     PwObjectTracker { objects: [osd.sink] }
