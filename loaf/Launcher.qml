@@ -73,7 +73,7 @@ PanelWindow {
         const w = it.kind === "app" && !fresh ? Niri.windowFor(it.entry) : null
         if (w) Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", String(w.id)])
         else if (it.kind === "app" && it.entry.runInTerminal) // Quickshell's execute() ignores Terminal=true
-            Quickshell.execDetached(["ghostty", "-e"].concat(it.entry.command))
+            Quickshell.execDetached(["loaf-terminal", "-e"].concat(it.entry.command))
         else if (it.kind === "app") it.entry.execute()
         else if (it.kind === "setting") Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", it.panel])
         else Quickshell.execDetached(["xdg-open", it.uri])

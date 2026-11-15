@@ -52,7 +52,7 @@ Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
 | Super+P | Mirror to an external screen |
 | Super+Shift+S | Screenshot of an area |
 | Super+Alt+L | Lock |
-| Super+T | Terminal (Ghostty) |
+| Super+T | Terminal (`$TERMINAL`, else the first of Ghostty, Console, GNOME Terminal, foot, Alacritty, kitty, xterm) |
 | Super+Shift+E | Log out |
 
 ## Layout
@@ -64,6 +64,9 @@ Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
 - `boot/`: login entry, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`), `install-system.sh`
 - `mako/`, `fuzzel/`, `hypr/`: notifications, fallback launcher, idle and fallback lock
 - `tests/`, `tools/`, `measurements/`: a small test, the power baseline tool and its results
+
+Your own niri settings (screens, rules for your apps, extra autostarts) go in `~/.config/loaf/niri.kdl`;
+Loaf's config includes it last when it exists, so it can override anything.
 
 Quickshell logs to `~/.cache/loaf/qs.log`.
 

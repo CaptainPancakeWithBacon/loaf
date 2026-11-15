@@ -11,5 +11,5 @@ case $1 in +*|-*) pct=$((pct + $1)) ;; *) pct=$1 ;; esac
 [ "$pct" -gt 100 ] && pct=100
 busctl call org.freedesktop.login1 /org/freedesktop/login1/session/auto org.freedesktop.login1.Session \
     SetBrightness ssu backlight "$d" $((max * pct / 100))
-[ "$2" = --no-osd ] || qs ipc -p ~/.config/quickshell/loaf call osd brightness "$pct" >/dev/null 2>&1
+[ "$2" = --no-osd ] || qs ipc -c loaf call osd brightness "$pct" >/dev/null 2>&1
 exit 0

@@ -17,25 +17,25 @@ ShellRoot {
         return Quickshell.screens.find(s => s.name === out) || Quickshell.screens[0]
     }
 
-    IpcHandler { // qs ipc -p ~/.config/quickshell/loaf call quick toggle
+    IpcHandler { // qs ipc -c loaf call quick toggle
         target: "quick"
         function toggle(): void { quick.open = !quick.open }
         function list(which: string): void { quick.open = true; quick.detail = which }
         function power(): void { quick.open = true; quick.powerMenu = true } // the power menu, for checking it by screenshot // "bt", "wifi" or ""; not named "show": qs ipc reads that as its own subcommand
     }
-    IpcHandler { // hypridle: qs ipc -p ~/.config/quickshell/loaf call lock lock
+    IpcHandler { // hypridle: qs ipc -c loaf call lock lock
         target: "lock"
         function lock(): void { loafLock.lock() }
         function test(): void { loafLock.lock(); safety.restart() } // unlocks itself after 45 s, for trying it out
         function sleep(): void { loafLock.sleep() } // hypridle before_sleep_cmd: stop the finger sensor
         function wake(): void { loafLock.wake() }   // hypridle after_sleep_cmd: start it again
     }
-    IpcHandler { // volume and brightness keys: qs ipc -p ~/.config/quickshell/loaf call osd volume | brightness 40
+    IpcHandler { // volume and brightness keys: qs ipc -c loaf call osd volume | brightness 40
         target: "osd"
         function volume(): void { osd.screen = focusedScreen(); osd.flash("volume") }
         function brightness(pct: int): void { osd.bright = pct; osd.screen = focusedScreen(); osd.flash("brightness") }
     }
-    IpcHandler { // Super+D: qs ipc -p ~/.config/quickshell/loaf call launcher toggle
+    IpcHandler { // Super+D: qs ipc -c loaf call launcher toggle
         target: "launcher"
         function toggle(): void { if (!launcher.open) launcher.screen = focusedScreen(); launcher.open = !launcher.open }
         function search(q: string): void { launcher.screen = focusedScreen(); launcher.open = true; launcher.search(q) }

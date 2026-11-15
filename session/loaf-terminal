@@ -1,0 +1,17 @@
+#!/bin/sh
+# Loaf's terminal: $TERMINAL if set, else the first one installed. "loaf-terminal -e CMD..." runs CMD in it.
+# Each terminal spells "run this" differently, so -e is translated here.
+for t in ${TERMINAL:-} ghostty kgx gnome-terminal foot alacritty kitty xterm; do
+    command -v "$t" >/dev/null 2>&1 || continue
+    if [ "${1:-}" = -e ]; then
+        shift
+        case $t in
+            gnome-terminal|kgx) exec "$t" -- "$@" ;;
+            foot|kitty) exec "$t" "$@" ;;
+            *) exec "$t" -e "$@" ;;
+        esac
+    fi
+    exec "$t" "$@"
+done
+echo "loaf-terminal: no terminal found; install one or set TERMINAL" >&2
+exit 1
