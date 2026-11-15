@@ -16,7 +16,7 @@ anchor=top-right
 layer=overlay
 format=<b>%s</b>\n%b
 
-[urgency=high]
+[urgency=critical]
 border-color=#151515
 border-size=2
 default-timeout=0
@@ -27,9 +27,13 @@ text-color=#ECECEA
 border-color=#2E2E2C
 progress-color=over #2A2A28
 
-[mode=dark urgency=high]
+[mode=dark urgency=critical]
 border-color=#ECECEA
 
 # last, so it wins over everything above
 [mode=do-not-disturb]
 invisible=1
+
+# except urgent ones (a battery about to run out)
+[mode=do-not-disturb urgency=critical]
+invisible=0

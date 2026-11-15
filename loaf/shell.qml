@@ -9,6 +9,7 @@ ShellRoot {
     Launcher { id: launcher }
     Lock { id: loafLock }
     Osd { id: osd }
+    BatteryWarning { id: batteryWarning } // once for all screens, not per bar
     Timer { id: safety; interval: 45000; onTriggered: loafLock.done() } // only armed by "lock test"
 
     // the screen niri has focused, for windows opened by key instead of by click
@@ -34,6 +35,10 @@ ShellRoot {
         target: "osd"
         function volume(): void { osd.screen = focusedScreen(); osd.flash("volume") }
         function brightness(pct: int): void { osd.bright = pct; osd.screen = focusedScreen(); osd.flash("brightness") }
+    }
+    IpcHandler { // trying the warning out: qs ipc -c loaf call battery test 10
+        target: "battery"
+        function test(level: int): void { batteryWarning.warn(level, level) }
     }
     IpcHandler { // Super+D: qs ipc -c loaf call launcher toggle
         target: "launcher"
