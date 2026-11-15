@@ -11,7 +11,10 @@ import QtQuick
 Scope {
     id: root
     property alias locked: session.locked
-    property string message: "Touch the sensor or type your password"
+    // Not every laptop has a reader, and not everyone enrolled a finger: checked at each lock, finger only then.
+    property bool hasFinger: false
+    readonly property string hint: hasFinger ? "Touch the sensor or type your password" : "Type your password"
+    property string message: hint
     property bool error: false
     property string pending: ""
     property bool busy: false
@@ -31,11 +34,20 @@ Scope {
         onExited: code => { root.log("fprintd restart exit " + code); if (session.locked && !root.asleep) retry.restart() }
     }
 
+    Process {
+        id: fingerCheck
+        command: ["sh", "-c", "fprintd-list \"$USER\" 2>/dev/null | grep -q '^ - #'"]
+        onExited: code => {
+            root.hasFinger = code === 0; root.message = root.hint; root.log("finger enrolled: " + root.hasFinger)
+            if (root.hasFinger && session.locked && !root.asleep) finger.start()
+        }
+    }
+
     function log(what) { console.log(new Date().toISOString() + " lock: " + what) }
     function lock() { session.locked = true }
-    function done() { finger.abort(); retry.stop(); asleep = false; session.locked = false; message = "Touch the sensor or type your password"; error = false }
+    function done() { finger.abort(); retry.stop(); asleep = false; session.locked = false; message = hint; error = false }
     function sleep() { log("sleep, finger off"); asleep = true; retry.stop(); finger.abort() }
-    function wake() { log("wake, finger back in 1.5 s"); asleep = false; fingerFails = 0; restartTried = false; if (session.locked) retry.restart() }
+    function wake() { log("wake, finger back in 1.5 s"); asleep = false; fingerFails = 0; restartTried = false; if (session.locked && hasFinger) retry.restart() }
     function tryPassword(text) {
         if (!text || busy) return
         pending = text; busy = true; error = false; message = "Checking"
@@ -45,7 +57,7 @@ Scope {
     WlSessionLock {
         id: session
         onLockedChanged: {
-            if (locked) { root.error = false; root.fingerFails = 0; root.restartTried = false; if (!root.asleep) finger.start() }
+            if (locked) { root.error = false; root.fingerFails = 0; root.restartTried = false; fingerCheck.running = true }
             // Tell logind (hypridle waits for this before letting the laptop suspend)
             Quickshell.execDetached(["busctl", "call", "org.freedesktop.login1", "/org/freedesktop/login1/session/auto",
                                      "org.freedesktop.login1.Session", "SetLockedHint", "b", locked ? "true" : "false"])
@@ -91,6 +103,7 @@ Scope {
                     spacing: 14
 
                     Rectangle { // fingerprint circle: ink ring, filled while PAM is listening
+                        visible: root.hasFinger
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: 84; height: 84; radius: 42
                         color: Theme.sheet; border { width: 1.5; color: root.error ? "#B4534B" : Theme.ink }
@@ -157,7 +170,7 @@ Scope {
     // after 3 failures in a row, leave fprintd alone for 35 s so it can exit and start fresh
     Timer {
         id: retry; interval: root.fingerFails >= 3 ? 35000 : 1500
-        onTriggered: if (session.locked && !root.asleep && !finger.active) { root.log("finger start"); finger.start() }
+        onTriggered: if (root.hasFinger && session.locked && !root.asleep && !finger.active) { root.log("finger start"); finger.start() }
     }
 
     // Password: started when Enter is pressed, answers PAM's prompt with what was typed.
