@@ -1,0 +1,15 @@
+# Loaf ISO: Ubuntu's own installer with every usual question ('*'), plus two steps at the end.
+# The installer reads this file from the root of the install medium (next to casper/).
+autoinstall:
+  version: 1
+  interactive-sections: ['*']
+  late-commands:
+    # Install Loaf from the packages on the ISO: a complete set resolved against Ubuntu's installed system, so
+    # dpkg needs no network (apt would fetch the same versions from the archive instead). If it fails,
+    # the install still finishes as plain Ubuntu instead of stopping with an error.
+    - >-
+      cp -r /cdrom/loaf /target/var/tmp/loaf &&
+      curtin in-target -- sh -c 'dpkg -i /var/tmp/loaf/*.deb' ;
+      rm -rf /target/var/tmp/loaf ; true
+    # The login screen remembers each person's last session; start the account made here on Loaf.
+    - curtin in-target -- /usr/lib/loaf/loaf-system default-session || true

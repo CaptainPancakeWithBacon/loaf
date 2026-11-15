@@ -6,3 +6,4 @@ niri/config.kdl
 .omc/
 boot/gdm/build/
 packaging/out/
+/iso/

@@ -29,6 +29,11 @@ As a package (Ubuntu 26.04): build it with `packaging/build-deb.sh`, then
 sudo apt install ./packaging/out/loaf_*.deb
 ```
 
+As an installer ISO: `packaging/build-iso.sh` takes Ubuntu's own 26.04.1 desktop ISO (put it and Ubuntu's
+`SHA256SUMS` in `iso/`) and adds two things: `/loaf`, the package plus the packages it needs that Ubuntu does not
+install (so installing works offline), and `/autoinstall.yaml`. Ubuntu's installer still asks all its usual
+questions; at the end it installs Loaf and starts the new account on it. Runs in Docker, no sudo.
+
 Or straight from the repo, for every user on the computer, with an undo:
 
 ```sh
@@ -66,7 +71,7 @@ Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
 - `session/`: login wrapper (niri runs as `niri.service`, needed for the portals), helper scripts, units
 - `boot/`: login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`); `session/loaf-system`
   switches them on and off
-- `packaging/build-deb.sh`: builds the .deb from `./install.sh --stage`
+- `packaging/build-deb.sh`: builds the .deb from `./install.sh --stage`; `packaging/build-iso.sh` the ISO
 - `mako/`, `fuzzel/`, `hypr/`: notifications, fallback launcher, idle and fallback lock
 - `tests/`, `tools/`, `measurements/`: a small test, the power baseline tool and its results
 

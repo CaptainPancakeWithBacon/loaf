@@ -3,6 +3,7 @@
 # install.sh --system and the .deb's postinst call "activate", --system-undo and the .deb's prerm "deactivate".
 #   activate     login logo + Loaf login theme (light/dark) + Loaf boot screen, then rebuild the boot image
 #   deactivate   back to Ubuntu's login logo, the previous login theme and Ubuntu's boot screen
+#   default-session [USER]   USER (default: the first account) starts on Loaf at the next login
 set -e
 T=/usr/share/plymouth/themes
 L=/usr/share/gnome-shell/theme/Loaf
@@ -40,5 +41,15 @@ deactivate)
     update-alternatives --remove default.plymouth $T/loaf/loaf.plymouth 2>/dev/null || true
     for f in $spinner; do rm -f $T/loaf/$f; done
     initramfs ;;
-*) echo "usage: loaf-system activate|deactivate" >&2; exit 1 ;;
+default-session)
+    # Start an account on Loaf at its next login: the login screen remembers each person's last session
+    # in AccountsService. Used by the ISO for the account made during install (the first one, uid 1000).
+    u=${2:-$(getent passwd 1000 | cut -d: -f1)}
+    [ -n "$u" ] || { echo "no user given and no uid 1000" >&2; exit 1; }
+    f=/var/lib/AccountsService/users/$u
+    mkdir -p /var/lib/AccountsService/users
+    if [ ! -f "$f" ]; then printf '[User]\nSession=loaf\nSessionType=wayland\nSystemAccount=false\n' > "$f"
+    elif grep -q '^Session=' "$f"; then sed -i 's/^Session=.*/Session=loaf/' "$f"
+    else sed -i '/^\[User\]/a Session=loaf' "$f"; fi ;;
+*) echo "usage: loaf-system activate|deactivate|default-session [USER]" >&2; exit 1 ;;
 esac
