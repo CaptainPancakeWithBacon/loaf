@@ -3,8 +3,6 @@
 #   sudo boot/install-system.sh        install: fprintd restart rule, login entry "Loaf", Loaf login screen + logo,
 #                                      Loaf boot screen (Framework logo, progress bar, Loaf at the bottom)
 #   sudo boot/install-system.sh undo   back to: no rule, no Loaf entry, the previous login theme (Isobar's), Ubuntu's boot screen
-# The old "Niri (Mist)" entry is left alone; remove it once Loaf has logged in fine:
-#   sudo rm /usr/share/wayland-sessions/niri-mist.desktop
 set -e
 [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }
 here=$(cd "$(dirname "$0")/.." && pwd)
@@ -34,7 +32,8 @@ fi
 sed "s|@USER@|$SUDO_USER|" "$here/session/50-loaf-fprintd.rules.in" > /etc/polkit-1/rules.d/50-loaf-fprintd.rules
 chmod 644 /etc/polkit-1/rules.d/50-loaf-fprintd.rules
 
-# 1. login entry
+# 1. login entry (the old "Niri (Mist)" entry goes: Loaf replaced it)
+rm -f /usr/share/wayland-sessions/niri-mist.desktop
 sed "s|@HOME@|$user_home|" "$here/session/loaf.desktop.in" > /usr/share/wayland-sessions/loaf.desktop
 chmod 644 /usr/share/wayland-sessions/loaf.desktop
 

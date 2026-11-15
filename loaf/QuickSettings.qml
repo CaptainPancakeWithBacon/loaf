@@ -63,7 +63,7 @@ PanelWindow {
         stdout: StdioCollector { onStreamFinished: { const p = text.split(","); if (p.length > 3) win.bright = parseInt(p[3]) } } }
     Process { id: dndRead; command: ["makoctl", "mode"]
         stdout: StdioCollector { onStreamFinished: win.dnd = text.includes("do-not-disturb") } }
-    Process { id: mirror; command: ["mist-mirror"] } // runs as long as the mirror is up
+    Process { id: mirror; command: ["loaf-mirror"] } // runs as long as the mirror is up
 
     function run(cmd) { Quickshell.execDetached(cmd) }
 

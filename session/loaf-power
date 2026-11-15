@@ -1,5 +1,5 @@
 #!/bin/sh
-# Power menu in the Mist launcher style. Choosing an entry is the confirmation.
+# Power menu in the fuzzel launcher (Super+X). Choosing an entry is the confirmation.
 c=$(printf 'Lock\nSuspend\nLog out\nRestart\nShut down\n' | fuzzel --dmenu --lines 5 --width 18)
 case "$c" in
   Lock) loginctl lock-session ;;

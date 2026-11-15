@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mist niri config = niri's own default config with a few exact substitutions.
+"""Loaf's niri config = niri's own default config with a few exact substitutions.
 Fails loudly if a substitution no longer matches (e.g. after a niri update)."""
 import os, re, sys
 src = open(sys.argv[1]).read()
@@ -24,8 +24,8 @@ sub(r'(focus-ring \{[^}]*?)(?<![/#])width 4', r'\1width 2')
 sub(r'/-window-rule \{(\s*)geometry-corner-radius 12', r'window-rule {\1geometry-corner-radius 18')
 sub(r'(\nhotkey-overlay \{)', r'\nprefer-no-csd\n\1')
 sub(r'(hotkey-overlay \{)', r'\1\n    skip-at-startup')
-sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" { spawn "mist-power"; }\n'
-    r'    Mod+P hotkey-overlay-title="Mirror to external screen" { spawn "mist-mirror"; }\n'
+sub(r'(\n    Mod\+D [^\n]*\n)', r'\1    Mod+X hotkey-overlay-title="Power menu" { spawn "loaf-power"; }\n'
+    r'    Mod+P hotkey-overlay-title="Mirror to external screen" { spawn "loaf-mirror"; }\n'
     # Gijs reaches for the GNOME/Windows key; Print, Ctrl+Print and Alt+Print stay as niri ships them.
     r'    Mod+Shift+S hotkey-overlay-title="Screenshot: select an area" { screenshot; }\n')
 sub(r'spawn "alacritty"', 'spawn "ghostty"')

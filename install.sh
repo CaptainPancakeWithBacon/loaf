@@ -8,7 +8,7 @@ mkdir -p ~/.local/bin ~/.config/niri ~/.config/xdg-desktop-portal ~/.config/syst
 install -m755 "$here/src/niri/target/release/niri" ~/.local/bin/niri
 install -m755 "$here/src/xwayland-satellite/target/release/xwayland-satellite" ~/.local/bin/
 cmake --install "$here/src/quickshell/build" >/dev/null
-install -m755 "$here/session/loaf-session" "$here/session/mist-power" "$here/session/mist-mirror" "$here/session/loaf-brightness" "$here/session/loaf-gtk-theme" ~/.local/bin/
+install -m755 "$here/session/loaf-session" "$here/session/loaf-power" "$here/session/loaf-mirror" "$here/session/loaf-brightness" "$here/session/loaf-gtk-theme" ~/.local/bin/
 install -m644 "$here/session/niri.service" "$here/session/niri-shutdown.target" ~/.config/systemd/user/
 
 python3 "$here/niri/make-config.py" "$here/src/niri/resources/default-config.kdl" ~/.config/niri/config.kdl
@@ -16,11 +16,9 @@ niri validate || { echo "niri config invalid"; exit 1; }
 
 link() { rm -rf "$2"; ln -s "$1" "$2"; }
 mkdir -p ~/.config/quickshell
-link "$here/quickshell"        ~/.config/quickshell/mist
 link "$here/loaf"             ~/.config/quickshell/loaf
 link "$here/mako"              ~/.config/mako
 link "$here/fuzzel"            ~/.config/fuzzel
-link "$here/swaylock"          ~/.config/swaylock
 link "$here/hypr"              ~/.config/hypr
 # hypridle/hyprlock come from apt (sudo, Gijs's part); this keeps hypridle out of GNOME.
 mkdir -p ~/.config/systemd/user/hypridle.service.d
