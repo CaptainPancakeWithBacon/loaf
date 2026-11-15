@@ -7,6 +7,14 @@
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
 scripts="loaf-session loaf-power loaf-mirror loaf-brightness loaf-gtk-theme loaf-terminal loaf-mako"
+# Ubuntu's login autostarts Loaf skips (systemd runs them as app-<name>@autostart.service; GNOME keeps them).
+# Your own ones in ~/.config/autostart are untouched.
+skip='update-notifier org.gnome.Evolution-alarm-notify print-applet org.kde.kdeconnect.daemon geoclue-demo-agent'
+skip_autostarts() { # $1 = systemd user unit folder
+    for a in $skip; do
+        install -D -m644 "$here/session/autostart-skip.conf" "$1/app-$(systemd-escape "$a")@autostart.service.d/loaf-skip.conf"
+    done
+}
 
 if [ "$1" = --system-undo ]; then
     [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }
@@ -14,6 +22,7 @@ if [ "$1" = --system-undo ]; then
     rm -f /etc/systemd/user/niri.service /etc/systemd/user/niri-shutdown.target
     rm -rf /etc/systemd/user/hypridle.service.d /etc/systemd/user/mako.service.d /etc/niri /etc/xdg/quickshell/loaf /etc/xdg/mako /etc/xdg/fuzzel /etc/xdg/hypr
     rm -f /etc/xdg/xdg-desktop-portal/niri-portals.conf
+    for a in $skip; do rm -rf "/etc/systemd/user/app-$(systemd-escape "$a")@autostart.service.d"; done
     echo "Removed."
     exit 0
 fi
@@ -29,6 +38,7 @@ if [ "$1" = --system ]; then
     install -m644 "$here/session/niri-shutdown.target" /etc/systemd/user/
     install -D -m644 "$here/session/hypridle-niri-only.conf" /etc/systemd/user/hypridle.service.d/niri-only.conf
     install -D -m644 "$here/session/mako-loaf.conf" /etc/systemd/user/mako.service.d/loaf.conf
+    skip_autostarts /etc/systemd/user
 
     # niri reads ~/.config/niri/config.kdl if it exists, else this one
     install -d /etc/niri
@@ -65,6 +75,7 @@ link "$here/hypr"              ~/.config/hypr
 # hypridle/hyprlock come from apt; this keeps hypridle out of GNOME.
 mkdir -p ~/.config/systemd/user/hypridle.service.d
 install -m644 "$here/session/hypridle-niri-only.conf" ~/.config/systemd/user/hypridle.service.d/niri-only.conf
+skip_autostarts ~/.config/systemd/user
 cp "$here/src/niri/resources/niri-portals.conf" ~/.config/xdg-desktop-portal/niri-portals.conf
 
 echo "Done. For the login entry, login screen and boot screen, run:"
