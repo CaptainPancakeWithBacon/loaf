@@ -15,7 +15,7 @@ The numbers and the method are in `measurements/` and `tools/baseline.py`.
 - **Quick settings** (click the right side of the bar): battery with time left, power menu, Wi-Fi and
   Bluetooth lists, power saver, dark style, do not disturb, screen mirroring, volume and brightness.
 - **Lock screen** (`loaf/Lock.qml`): finger or password, on every screen. The fingerprint reader recovers
-  by itself after a suspend (see `session/50-loaf-fprintd.rules.in`).
+  by itself after a suspend (see `session/50-loaf-fprintd.rules`).
 - **Volume and brightness** on the F-keys with a small on-screen card; brightness goes through logind,
   no root needed.
 - **Light and dark** follow the system setting, and GTK3 apps and the login screen follow along.

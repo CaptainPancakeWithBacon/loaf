@@ -1,11 +1,10 @@
 #!/bin/sh
-# Runs as root (loaf-login-scheme.service), started when the user's choice file changes.
+# Runs as root (loaf-login-scheme@light|dark.service, which loaf-gtk-theme starts on every switch).
 # Puts the light or dark login theme in place. Accepts exactly "light" or "dark"; anything else is ignored.
-# loaf-login-scheme FILE
+# loaf-login-scheme light|dark
 set -eu
 D=/usr/share/gnome-shell/theme/Loaf
-want=$(head -c 8 "$1" 2>/dev/null | tr -cd 'a-z')
-case $want in light|dark) ;; *) exit 0 ;; esac
+case ${1:-} in light|dark) want=$1 ;; *) exit 0 ;; esac
 cmp -s "$D/$want.gresource" "$D/gnome-shell-theme.gresource" && exit 0
 cp -f "$D/$want.gresource" "$D/gnome-shell-theme.gresource.new"
 mv -f "$D/gnome-shell-theme.gresource.new" "$D/gnome-shell-theme.gresource"

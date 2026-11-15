@@ -1,0 +1,6 @@
+[Unit]
+Description=Loaf: put the %i login theme in place
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/loaf-login-scheme %i

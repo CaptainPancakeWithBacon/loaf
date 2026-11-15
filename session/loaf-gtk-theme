@@ -3,8 +3,8 @@
 # color-scheme on their own; GTK3 apps only follow gtk-theme, so swap NAME <-> NAME-dark.
 # loaf-gtk-theme dark|light   (does nothing if the other variant isn't installed)
 case $1 in dark|light) ;; *) exit 1 ;; esac
-# the login screen follows the last choice (loaf-login-scheme.path, a root unit, watches this file)
-mkdir -p "$HOME/.local/state/loaf" && printf '%s\n' "$1" > "$HOME/.local/state/loaf/login-scheme"
+# the login screen follows the last choice (a root unit; polkit lets the person at the computer start it)
+systemctl start --no-block --no-ask-password "loaf-login-scheme@$1.service" 2>/dev/null
 cur=$(gsettings get org.gnome.desktop.interface gtk-theme | tr -d "'")
 base=${cur%-dark}
 case $1 in dark) want=$base-dark ;; light) want=$base ;; *) exit 1 ;; esac

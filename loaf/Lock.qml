@@ -26,7 +26,7 @@ Scope {
     // it does ~30 s after its last client: so after 3 failures the lock stays quiet for 35 s, then tries again.
     property bool asleep: false
     property int fingerFails: 0
-    // first fix after a failure: restart fprintd (allowed by session/50-loaf-fprintd.rules.in), then try again
+    // first fix after a failure: restart fprintd (allowed by session/50-loaf-fprintd.rules), then try again
     property bool restartTried: false
     Process {
         id: restartFprintd
