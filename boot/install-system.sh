@@ -1,7 +1,7 @@
 #!/bin/sh
 # Loaf's system-wide bits (the only part that needs root). Run from the repo:
-#   sudo boot/install-system.sh        install: login entry "Loaf", logo on the login screen, Loaf boot screen
-#   sudo boot/install-system.sh undo   back to: no Loaf entry, no login logo, Ubuntu's boot screen (bgrt)
+#   sudo boot/install-system.sh        install: fprintd restart rule, login entry "Loaf", login logo, Loaf boot screen
+#   sudo boot/install-system.sh undo   back to: no rule, no Loaf entry, no login logo, Ubuntu's boot screen (bgrt)
 # The old "Niri (Mist)" entry is left alone; remove it once Loaf has logged in fine:
 #   sudo rm /usr/share/wayland-sessions/niri-mist.desktop
 set -e
@@ -12,6 +12,7 @@ T=/usr/share/plymouth/themes
 G=/etc/gdm3/greeter.dconf-defaults
 
 if [ "$1" = undo ]; then
+    rm -f /etc/polkit-1/rules.d/50-loaf-fprintd.rules
     rm -f /usr/share/wayland-sessions/loaf.desktop
     sed -i "s|^logo='/usr/share/pixmaps/loaf-login.png'|#logo='/usr/share/images/vendor-logos/logo-text-version-64.png'|" "$G"
     rm -f /usr/share/pixmaps/loaf-login.png
@@ -22,6 +23,10 @@ if [ "$1" = undo ]; then
     echo "Undone. Reboot to see Ubuntu's boot screen again."
     exit 0
 fi
+
+# 0. the lock may restart fprintd after a suspend broke it (only that unit, only that verb, only you)
+sed "s|@USER@|$SUDO_USER|" "$here/session/50-loaf-fprintd.rules.in" > /etc/polkit-1/rules.d/50-loaf-fprintd.rules
+chmod 644 /etc/polkit-1/rules.d/50-loaf-fprintd.rules
 
 # 1. login entry
 sed "s|@HOME@|$user_home|" "$here/session/loaf.desktop.in" > /usr/share/wayland-sessions/loaf.desktop

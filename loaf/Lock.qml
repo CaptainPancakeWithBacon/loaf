@@ -5,6 +5,7 @@
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Pam
+import Quickshell.Io
 import QtQuick
 
 Scope {
@@ -16,8 +17,25 @@ Scope {
     property bool busy: false
     readonly property string pamDir: Quickshell.shellPath("pam")
 
+    // The sensor breaks if the laptop suspends while fprintd is listening ("Cannot run while suspended",
+    // then PAM code 9 on every try). hypridle calls sleep()/wake() around every suspend, but closing the lid
+    // suspends in the same second, so sleep() can lose that race. fprintd only recovers once it exits, which
+    // it does ~30 s after its last client: so after 3 failures the lock stays quiet for 35 s, then tries again.
+    property bool asleep: false
+    property int fingerFails: 0
+    // first fix after a failure: restart fprintd (allowed by session/50-loaf-fprintd.rules.in), then try again
+    property bool restartTried: false
+    Process {
+        id: restartFprintd
+        command: ["systemctl", "restart", "--no-ask-password", "fprintd.service"]
+        onExited: code => { root.log("fprintd restart exit " + code); if (session.locked && !root.asleep) retry.restart() }
+    }
+
+    function log(what) { console.log(new Date().toISOString() + " lock: " + what) }
     function lock() { session.locked = true }
-    function done() { finger.abort(); retry.stop(); session.locked = false; message = "Touch the sensor or type your password"; error = false }
+    function done() { finger.abort(); retry.stop(); asleep = false; session.locked = false; message = "Touch the sensor or type your password"; error = false }
+    function sleep() { log("sleep, finger off"); asleep = true; retry.stop(); finger.abort() }
+    function wake() { log("wake, finger back in 1.5 s"); asleep = false; fingerFails = 0; restartTried = false; if (session.locked) retry.restart() }
     function tryPassword(text) {
         if (!text || busy) return
         pending = text; busy = true; error = false; message = "Checking"
@@ -27,7 +45,7 @@ Scope {
     WlSessionLock {
         id: session
         onLockedChanged: {
-            if (locked) { root.error = false; finger.start() }
+            if (locked) { root.error = false; root.fingerFails = 0; root.restartTried = false; if (!root.asleep) finger.start() }
             // Tell logind (hypridle waits for this before letting the laptop suspend)
             Quickshell.execDetached(["busctl", "call", "org.freedesktop.login1", "/org/freedesktop/login1/session/auto",
                                      "org.freedesktop.login1.Session", "SetLockedHint", "b", locked ? "true" : "false"])
@@ -122,9 +140,25 @@ Scope {
             if (result === PamResult.Success) root.done()
             else if (session.locked) { root.error = true; root.message = "Finger not recognised"; retry.start() }
         }
-        onError: if (session.locked) retry.start()
+        onError: {
+            if (!session.locked || root.asleep) return
+            root.log("finger error " + (root.fingerFails + 1))
+            if (!root.restartTried) {   // most likely a suspend broke fprintd: restart it once, right away
+                root.restartTried = true
+                if (!root.busy) root.message = "Waking up the fingerprint reader"
+                restartFprintd.running = true
+                return
+            }
+            root.fingerFails++
+            if (root.fingerFails >= 3 && !root.busy) { root.error = true; root.message = "Fingerprint is restarting, type your password or wait half a minute" }
+            retry.start()
+        }
     }
-    Timer { id: retry; interval: 1500; onTriggered: if (session.locked && !finger.active) finger.start() }
+    // after 3 failures in a row, leave fprintd alone for 35 s so it can exit and start fresh
+    Timer {
+        id: retry; interval: root.fingerFails >= 3 ? 35000 : 1500
+        onTriggered: if (session.locked && !root.asleep && !finger.active) { root.log("finger start"); finger.start() }
+    }
 
     // Password: started when Enter is pressed, answers PAM's prompt with what was typed.
     PamContext {

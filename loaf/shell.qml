@@ -26,6 +26,8 @@ ShellRoot {
         target: "lock"
         function lock(): void { loafLock.lock() }
         function test(): void { loafLock.lock(); safety.restart() } // unlocks itself after 45 s, for trying it out
+        function sleep(): void { loafLock.sleep() } // hypridle before_sleep_cmd: stop the finger sensor
+        function wake(): void { loafLock.wake() }   // hypridle after_sleep_cmd: start it again
     }
     IpcHandler { // volume and brightness keys: qs ipc -p ~/.config/quickshell/loaf call osd volume | brightness 40
         target: "osd"
