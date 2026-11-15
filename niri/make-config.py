@@ -56,8 +56,8 @@ window-rule {
 }
 '''
 # Personal settings last, so they can override anything above: screens and their modes, rules for your own
-# apps, extra autostarts. Relative to this file (~/.config/niri/). Skipped when it does not exist.
+# apps, extra autostarts. In the home folder, also when this config is the system one (/etc/niri).
 src += '''
-include optional=true "../loaf/niri.kdl"
+include optional=true "~/.config/loaf/niri.kdl"
 '''
 open(sys.argv[2], "w").write(src)

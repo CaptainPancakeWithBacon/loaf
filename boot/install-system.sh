@@ -37,7 +37,9 @@ fi
 
 # 1. login entry (the old "Niri (Mist)" entry goes: Loaf replaced it)
 rm -f /usr/share/wayland-sessions/niri-mist.desktop
-sed "s|@HOME@|$user_home|" "$here/session/loaf.desktop.in" > /usr/share/wayland-sessions/loaf.desktop
+# system-wide install (install.sh --system) puts loaf-session in /usr/local/bin, a user install in ~/.local/bin
+bin="$user_home/.local/bin"; [ -x /usr/local/bin/loaf-session ] && bin=/usr/local/bin
+sed "s|@BIN@|$bin|" "$here/session/loaf.desktop.in" > /usr/share/wayland-sessions/loaf.desktop
 chmod 644 /usr/share/wayland-sessions/loaf.desktop
 
 # 2. logo under the user list on the login screen (Ubuntu's own setting, commented out by default)
