@@ -1,6 +1,6 @@
 #!/bin/sh
-# mako only reads ~/.config/mako/config; on a system-wide install Loaf's copy is in /etc/xdg.
+# mako only reads ~/.config/mako/config; on a system-wide install Loaf's copy is in /etc/xdg/xdg-loaf.
 # Started by apt's mako.service (session/mako-loaf.conf points it here).
 c=${XDG_CONFIG_HOME:-$HOME/.config}/mako/config
-[ -f "$c" ] || c=/etc/xdg/mako/config
+[ -f "$c" ] || c=/etc/xdg/xdg-loaf/mako/config
 exec mako -c "$c"

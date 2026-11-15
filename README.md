@@ -23,19 +23,22 @@ The numbers and the method are in `measurements/` and `tools/baseline.py`.
 
 ## Install
 
-User-level, nothing here touches the GNOME session:
+As a package (Ubuntu 26.04): build it with `packaging/build-deb.sh`, then
 
 ```sh
-./install.sh
+sudo apt install ./packaging/out/loaf_*.deb
 ```
 
-The parts that need root (login entry, login screen theme, boot screen, the fingerprint rule) are one
-script, with an undo:
+Or straight from the repo, for every user on the computer, with an undo:
 
 ```sh
-sudo boot/install-system.sh
-sudo boot/install-system.sh undo
+sudo ./install.sh --system
+sudo ./install.sh --system-undo
 ```
+
+Both add "Loaf" to the login screen next to GNOME and switch the login and boot screen to Loaf's;
+removing the package or `--system-undo` puts Ubuntu's back. For working on Loaf itself, `./install.sh`
+(no sudo) links the repo into your home folder, which wins over the system copy.
 
 Build first (sources go in `src/`, ignored): niri v26.04 and xwayland-satellite v0.8.3 with
 `cargo build --release`, Quickshell 0.3.2 with
@@ -61,7 +64,9 @@ Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
 - `niri/make-config.py`: builds `~/.config/niri/config.kdl` from niri's own default config with a few exact
   substitutions; it fails loudly when one no longer matches
 - `session/`: login wrapper (niri runs as `niri.service`, needed for the portals), helper scripts, units
-- `boot/`: login entry, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`), `install-system.sh`
+- `boot/`: login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`); `session/loaf-system`
+  switches them on and off
+- `packaging/build-deb.sh`: builds the .deb from `./install.sh --stage`
 - `mako/`, `fuzzel/`, `hypr/`: notifications, fallback launcher, idle and fallback lock
 - `tests/`, `tools/`, `measurements/`: a small test, the power baseline tool and its results
 

@@ -13,7 +13,7 @@ def sub(pattern, repl, flags=0):
     if n != 1:
         sys.exit(f"no match for: {pattern}")
 
-# The shell is found by name (qs -c loaf): ~/.config/quickshell/loaf if the user has one, else /etc/xdg/quickshell/loaf.
+# The shell is found by name (qs -c loaf): ~/.config/quickshell/loaf if the user has one, else Loaf's copy in /etc/xdg/xdg-loaf.
 QS = "qs ipc -c loaf call"
 # Loaf draws its own ground (follows dark style), so no swaybg.
 sub(r'spawn-at-startup "waybar"',

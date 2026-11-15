@@ -1,6 +1,6 @@
 #!/bin/sh
 # Builds Loaf's login-screen themes: Yaru's own gnome-shell theme plus loaf-login-{light,dark}.css appended to gdm.css.
-# Needs nothing from root. Output: boot/gdm/build/{light,dark}.gresource (install-system.sh installs them).
+# Needs nothing from root. Output: boot/gdm/build/{light,dark}.gresource (install.sh --system and the .deb install them).
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 SRC=${LOAF_YARU_GRESOURCE:-/usr/share/gnome-shell/theme/Yaru/gnome-shell-theme.gresource}

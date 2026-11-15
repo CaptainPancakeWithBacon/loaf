@@ -5,3 +5,4 @@ niri/config.kdl
 *.log
 .omc/
 boot/gdm/build/
+packaging/out/

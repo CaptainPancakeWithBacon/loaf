@@ -4,6 +4,8 @@
 # xdg-desktop-portal-gnome fails its dependency and every portal call times out.
 export PATH="$HOME/.local/bin:$PATH"
 export XDG_CURRENT_DESKTOP=niri
+# Loaf's settings layer (/etc/xdg/xdg-loaf): GDM adds it for this login entry; this covers other ways in
+case ":${XDG_CONFIG_DIRS:-}:" in *:/etc/xdg/xdg-loaf:*) ;; *) export XDG_CONFIG_DIRS=/etc/xdg/xdg-loaf:${XDG_CONFIG_DIRS:-/etc/xdg} ;; esac
 export XDG_SESSION_TYPE=wayland
 export QT_QPA_PLATFORM=wayland
 export MOZ_ENABLE_WAYLAND=1
