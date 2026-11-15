@@ -175,6 +175,12 @@ PanelWindow {
                 Btn { width: parent.w; label: "Suspend"; onClicked: { win.open = false; win.run(["systemctl", "suspend"]) } }
                 Btn { width: parent.w; label: "Log out"; onClicked: win.run(["niri", "msg", "action", "quit", "--skip-confirmation"]) }
             }
+            Row {
+                visible: win.powerMenu; spacing: 8; width: parent.width
+                readonly property real w: (width - 8) / 2
+                Btn { width: parent.w; label: "Restart"; onClicked: win.run(["systemctl", "reboot"]) }
+                Btn { width: parent.w; label: "Power off"; onClicked: win.run(["systemctl", "poweroff"]) }
+            }
 
             Grid {
                 columns: 2; spacing: 8; width: parent.width
