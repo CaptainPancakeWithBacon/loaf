@@ -1,0 +1,6 @@
+[Unit]
+Description=Loaf: put the light or dark login theme in place
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/loaf-login-scheme @HOME@/.local/state/loaf/login-scheme

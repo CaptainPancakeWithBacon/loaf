@@ -1,0 +1,52 @@
+/* ---- Loaf: appended to Yaru's gdm.css by boot/gdm/build.sh ---- */
+/* Night ground like the boot screen, sheet-coloured card and field, the Loaf logo under the list. */
+#lockDialogGroup {
+  background-color: #121212;
+  background-image: none; }
+
+#panel {
+  background-color: transparent;
+  box-shadow: none; }
+
+.login-dialog-logo-bin {
+  padding: 24px 0;
+  opacity: 0.75; }
+
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item {
+  background-color: #1c1c1b;
+  border: 1px solid #2e2e2c;
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 10px 18px;
+  color: #ececea; }
+
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:hover,
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:focus,
+.login-dialog-user-list-view .login-dialog-user-list .login-dialog-user-list-item:selected {
+  background-color: #2a2a28;
+  border: 1px solid #3a3a37;
+  box-shadow: none; }
+
+.login-dialog .user-widget.horizontal .user-widget-label {
+  color: #ececea;
+  font-weight: 500; }
+
+.login-dialog-not-listed-label,
+.login-dialog-not-listed-button {
+  color: #a3a39e; }
+
+.login-dialog .login-dialog-prompt-entry {
+  background-color: #1c1c1b;
+  border: 1px solid #2e2e2c;
+  border-radius: 14px;
+  color: #ececea;
+  caret-color: #ececea; }
+
+.login-dialog .login-dialog-prompt-entry:focus {
+  border: 1px solid #a3a39e;
+  box-shadow: none; }
+
+.login-dialog-button.default,
+.login-dialog .button.default {
+  background-color: #ececea;
+  color: #121212; }

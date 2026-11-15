@@ -1,0 +1,9 @@
+[Unit]
+Description=Loaf: follow the user's light/dark choice on the login screen
+
+[Path]
+PathChanged=@HOME@/.local/state/loaf/login-scheme
+Unit=loaf-login-scheme.service
+
+[Install]
+WantedBy=multi-user.target

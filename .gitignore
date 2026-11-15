@@ -4,3 +4,4 @@ session/loaf.desktop
 niri/config.kdl
 *.log
 .omc/
+boot/gdm/build/
