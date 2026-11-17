@@ -10,6 +10,9 @@ export XDG_SESSION_TYPE=wayland
 export QT_QPA_PLATFORM=wayland
 export MOZ_ENABLE_WAYLAND=1
 export ELECTRON_OZONE_PLATFORM_HINT=auto
+# Quickshell only uses an icon theme it is told about: the one chosen in GNOME's settings
+QS_ICON_THEME=$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | tr -d "'")
+export QS_ICON_THEME
 
 if systemctl --user -q is-active niri.service; then
     echo 'A niri session is already running.'

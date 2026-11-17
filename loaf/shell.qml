@@ -5,7 +5,8 @@ import Quickshell.Io
 import QtQuick
 
 ShellRoot {
-    QuickSettings { id: quick } // one card, opened on the screen whose bar was clicked
+    QuickSettings { id: quick; notifs: notifications } // one card, opened on the screen whose bar was clicked
+    Notifications { id: notifications; screen: focusedScreen() } // cards follow the focused screen
     Launcher { id: launcher }
     Lock { id: loafLock }
     Osd { id: osd }
@@ -35,6 +36,10 @@ ShellRoot {
         target: "osd"
         function volume(): void { osd.screen = focusedScreen(); osd.flash("volume") }
         function brightness(pct: int): void { osd.bright = pct; osd.screen = focusedScreen(); osd.flash("brightness") }
+    }
+    IpcHandler { // the list under the clock: qs ipc -c loaf call notifications toggle
+        target: "notifications"
+        function toggle(): void { notifications.listScreen = focusedScreen(); notifications.listOpen = !notifications.listOpen }
     }
     IpcHandler { // trying the warning out: qs ipc -c loaf call battery test 10
         target: "battery"
@@ -67,11 +72,19 @@ ShellRoot {
             }
             Bar {
                 modelData: s.modelData
+                notifs: notifications
                 onSearchClicked: { launcher.screen = s.modelData; launcher.open = !launcher.open }
+                onClockClicked: {
+                    const same = notifications.listScreen === s.modelData
+                    notifications.listScreen = s.modelData
+                    notifications.listOpen = !(notifications.listOpen && same)
+                    quick.open = false
+                }
                 onQuickClicked: {
                     const same = quick.screen === s.modelData
                     quick.screen = s.modelData
                     quick.open = !(quick.open && same)
+                    notifications.listOpen = false
                 }
             }
         }

@@ -7,7 +7,7 @@
 #                                   system install once for the login entry; the home folder wins over /etc.
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
-scripts="loaf-session loaf-power loaf-mirror loaf-brightness loaf-gtk-theme loaf-terminal loaf-mako"
+scripts="loaf-session loaf-power loaf-mirror loaf-brightness loaf-gtk-theme loaf-terminal"
 # Ubuntu's login autostarts Loaf skips (systemd runs them as app-<name>@autostart.service; GNOME keeps them).
 # Your own ones in ~/.config/autostart are untouched.
 skip='update-notifier org.gnome.Evolution-alarm-notify print-applet org.kde.kdeconnect.daemon geoclue-demo-agent'
@@ -29,11 +29,11 @@ stage() {
     for s in $scripts; do install -m755 "$here/session/$s" $S$P/bin/; done
     install -m755 "$here/session/loaf-system" "$here/session/loaf-login-scheme" $S$P/lib/loaf/
 
-    # session: niri as a user service, idle/lock only in Loaf, mako with Loaf's config, fewer autostarts
+    # session: niri as a user service, idle/lock only in Loaf, no mako (Loaf shows notifications), fewer autostarts
     sed "s|%h/.local/bin/niri|$P/bin/niri|" "$here/session/niri.service" > $U/user/niri.service
     install -m644 "$here/session/niri-shutdown.target" $U/user/
     install -D -m644 "$here/session/hypridle-niri-only.conf" $U/user/hypridle.service.d/niri-only.conf
-    install -d $U/user/mako.service.d && sed "s|@PREFIX@|$P|" "$here/session/mako-loaf.conf" > $U/user/mako.service.d/loaf.conf
+    install -D -m644 "$here/session/mako-loaf.conf" $U/user/mako.service.d/loaf.conf
     skip_autostarts $U/user
     sed "s|@BIN@|$P/bin|" "$here/session/loaf.desktop.in" > $S/usr/share/wayland-sessions/loaf.desktop
 
@@ -44,7 +44,6 @@ stage() {
     # Loaf's own settings layer: GDM puts /etc/xdg/xdg-loaf in XDG_CONFIG_DIRS for a Loaf login (loaf-session
     # makes sure), so these apply in Loaf only, never in GNOME, and never clash with other packages' files
     install -d $X/quickshell && tar -C "$here" --exclude='.*' -cf - loaf | tar -C $X/quickshell -xf - --no-same-owner
-    install -D -m644 "$here/mako/config" $X/mako/config
     install -D -m644 "$here/fuzzel/fuzzel.ini" $X/fuzzel/fuzzel.ini
     install -D -m644 "$here/hypr/hypridle.conf" $X/hypr/hypridle.conf
     install -D -m644 "$here/hypr/hyprlock.conf" $X/hypr/hyprlock.conf
@@ -105,7 +104,10 @@ niri validate || { echo "niri config invalid"; exit 1; }
 link() { rm -rf "$2"; ln -s "$1" "$2"; }
 mkdir -p ~/.config/quickshell
 link "$here/loaf"             ~/.config/quickshell/loaf
-link "$here/mako"              ~/.config/mako
+# Loaf shows notifications itself: keep mako out of Loaf sessions (GNOME is unaffected)
+[ -L ~/.config/mako ] && rm ~/.config/mako
+install -D -m644 "$here/session/mako-loaf.conf" ~/.config/systemd/user/mako.service.d/loaf.conf
+install -D -m644 "$here/session/fr.emersion.mako.service" ~/.local/share/dbus-1/services/fr.emersion.mako.service
 link "$here/fuzzel"            ~/.config/fuzzel
 link "$here/hypr"              ~/.config/hypr
 # hypridle/hyprlock come from apt; this keeps hypridle out of GNOME.

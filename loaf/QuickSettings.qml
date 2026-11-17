@@ -1,7 +1,7 @@
 // Loaf quick settings: battery and watts, power menu, six tiles, volume and brightness.
 // Layout from Personal/Loaf/demo/still-demo.html (.quick). Everything reads services that push
 // changes (UPower, NetworkManager, BlueZ, PipeWire, power-profiles-daemon); nothing polls.
-// Brightness and do-not-disturb have no event source, so they are read when the card opens.
+// Brightness has no event source, so it is read when the card opens.
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -16,8 +16,9 @@ PanelWindow {
     property bool open: false
     property bool powerMenu: false
     property string detail: "" // "", "bt" or "wifi": the list under the tiles (right-click a tile, or its arrow)
+    property var notifs: null  // Notifications.qml: do not disturb
     visible: open
-    onOpenChanged: { scan(); if (open) { powerMenu = false; detail = ""; brightRead.running = true; dndRead.running = true } }
+    onOpenChanged: { scan(); if (open) { powerMenu = false; detail = ""; brightRead.running = true } }
     onDetailChanged: scan()
     // Wi-Fi scanning costs power: only while the network list is on screen
     function scan() { if (wifiDev) wifiDev.scannerEnabled = open && detail === "wifi" }
@@ -42,7 +43,6 @@ PanelWindow {
     readonly property var btDevice: bt ? (bt.devices.values.find(d => d.connected) || null) : null
     readonly property var sink: Pipewire.defaultAudioSink
     property int bright: 50
-    property bool dnd: false
 
     PwObjectTracker { objects: [win.sink] }
 
@@ -61,8 +61,6 @@ PanelWindow {
 
     Process { id: brightRead; command: ["brightnessctl", "-m", "--class=backlight"]
         stdout: StdioCollector { onStreamFinished: { const p = text.split(","); if (p.length > 3) win.bright = parseInt(p[3]) } } }
-    Process { id: dndRead; command: ["makoctl", "mode"]
-        stdout: StdioCollector { onStreamFinished: win.dnd = text.includes("do-not-disturb") } }
     Process { id: mirror; command: ["loaf-mirror"] } // runs as long as the mirror is up
 
     function run(cmd) { Quickshell.execDetached(cmd) }
@@ -208,9 +206,9 @@ PanelWindow {
                     onToggled: Theme.setDark(!Theme.dark)
                 }
                 Tile {
-                    width: parent.w; title: "Do not disturb"; on: win.dnd
-                    sub: on ? "On" : "Off"
-                    onToggled: { win.dnd = !win.dnd; win.run(["makoctl", "mode", "-t", "do-not-disturb"]) }
+                    width: parent.w; title: "Do not disturb"; on: !!win.notifs && win.notifs.dnd
+                    sub: on ? "Only urgent ones" : "Off"
+                    onToggled: if (win.notifs) win.notifs.dnd = !win.notifs.dnd
                 }
                 Tile {
                     width: parent.w; title: "Screen"; on: mirror.running

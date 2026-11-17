@@ -16,7 +16,7 @@ mkdir -p "$out/shlibs/debian" && printf 'Source: loaf\n\nPackage: loaf\nArchitec
 shlibs=$(cd "$out/shlibs" && dpkg-shlibdeps -O "$root/usr/bin/niri" "$root/usr/bin/quickshell" "$root/usr/bin/xwayland-satellite" | sed 's/^shlibs:Depends=//')
 
 # everything Loaf calls or loads besides those libraries
-needs="qml6-module-qtquick, qml6-module-qtquick-layouts, qt6-svg-plugins, fuzzel, mako-notifier, hypridle, hyprlock,
+needs="qml6-module-qtquick, qml6-module-qtquick-layouts, qml6-module-qtquick-shapes, qt6-svg-plugins, fuzzel, hypridle, hyprlock,
  brightnessctl, wireplumber, libnotify-bin, wl-mirror, gnome-settings-daemon, xdg-desktop-portal-gnome,
  xdg-desktop-portal-gtk, gdm3, plymouth-theme-spinner, polkitd, python3"
 

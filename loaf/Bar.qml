@@ -1,4 +1,5 @@
-// Loaf bar, one per screen: search, workspace dots | clock | wifi, watts, battery.
+// Loaf bar, one per screen: search, workspace dots | date and time (opens the notifications) | network,
+// watts and time left, battery (opens quick settings).
 // Idle rules: clock ticks per minute (SystemClock), everything else follows events.
 import Quickshell
 import Quickshell.Networking
@@ -8,8 +9,10 @@ import QtQuick
 PanelWindow {
     id: bar
     required property var modelData
+    property var notifs: null
     signal quickClicked()
     signal searchClicked()
+    signal clockClicked()
     screen: modelData
     anchors { top: true; left: true; right: true }
     implicitHeight: 32
@@ -17,8 +20,20 @@ PanelWindow {
 
     readonly property var dots: Niri.on(screen.name)
     readonly property var wifiDev: Networking.devices.values.find(d => d.type === DeviceType.Wifi) || null
+    readonly property var wifiNet: wifiDev ? wifiDev.networks.values.find(n => n.connected) || null : null
+    readonly property bool wired: Networking.devices.values.some(d => d.type === DeviceType.Wired && d.connected)
+    // the dock's cable wins over Wi-Fi, like NetworkManager's own route
+    readonly property string net: wired ? "cable" : wifiDev && wifiDev.connected ? "wifi" : "none"
     readonly property var battery: UPower.displayDevice
     readonly property bool discharging: battery.isPresent && battery.state === UPowerDeviceState.Discharging
+    readonly property bool charging: battery.isPresent && battery.state === UPowerDeviceState.Charging
+    // UPower's estimate: time to empty on battery, to full while charging ("" until it has one)
+    readonly property string timeLeft: hm(discharging ? battery.timeToEmpty : charging ? battery.timeToFull : 0)
+    function hm(sec) {
+        if (!(sec > 0)) return ""
+        const m = Math.round(sec / 60)
+        return m < 60 ? m + "m" : Math.floor(m / 60) + "h " + String(m % 60).padStart(2, "0") + "m"
+    }
 
     SystemClock { id: clock; precision: SystemClock.Minutes }
 
@@ -66,18 +81,42 @@ PanelWindow {
         }
     }
 
-    Row { // date, quiet, next to the time; the minute tick also rolls the date over at midnight
+    Btn { // date, quiet, next to the time (the minute tick also rolls the date over at midnight);
+          // a dot when notifications came in since the list was last opened. Click: the list.
         anchors.centerIn: parent
-        spacing: 8
+        onClicked: bar.clockClicked()
         Label { text: Qt.formatDate(clock.date, "ddd d MMM"); color: Theme.mute }
         Label { text: Qt.formatTime(clock.date, "HH:mm"); font.weight: Font.Medium }
+        Rectangle {
+            visible: !!bar.notifs && bar.notifs.unseen > 0
+            anchors.verticalCenter: parent.verticalCenter
+            width: 7; height: 7; radius: 3.5; color: Theme.ink
+        }
     }
 
     Btn {
         anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
         onClicked: bar.quickClicked()
-        Label { text: bar.wifiDev && bar.wifiDev.connected ? "wifi" : "offline"; opacity: bar.wifiDev && bar.wifiDev.connected ? 1 : 0.55 }
-        Label { visible: bar.discharging && bar.battery.changeRate > 0; text: bar.battery.changeRate.toFixed(1) + " W"; color: Theme.mute }
-        Label { visible: bar.battery.isPresent; text: Math.round(bar.battery.percentage * 100) + "%" }
+        NetIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            kind: bar.net
+            strength: bar.wifiNet ? bar.wifiNet.signalStrength : 0
+        }
+        Label { // power in or out, then the time left (to full while charging)
+            visible: (bar.discharging || bar.charging) && bar.battery.changeRate > 0
+            text: (bar.charging ? "+" : "") + bar.battery.changeRate.toFixed(1) + " W" + (bar.timeLeft ? " · " + bar.timeLeft : "")
+            color: Theme.mute
+        }
+        Row {
+            visible: bar.battery.isPresent
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 6
+            BatteryIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                level: bar.battery.percentage
+                charging: bar.charging
+            }
+            Label { text: Math.round(bar.battery.percentage * 100) + "%" }
+        }
     }
 }

@@ -46,22 +46,62 @@
 .login-dialog-session-list-button {
   color: #6e6a62; }
 
-.login-dialog .login-dialog-prompt-entry {
-  background-color: #fbf8f1;
+/* The password field: Yaru colours it dark in every state (hover, focus, while checking), with a
+   !important focus ring, so each state is set here. */
+.login-dialog .login-dialog-prompt-entry,
+.login-dialog .login-dialog-prompt-entry:hover,
+.login-dialog .login-dialog-prompt-entry:focus,
+.login-dialog .login-dialog-prompt-entry:insensitive {
+  background-color: #fbf8f1 !important;
+  color: #151515 !important;
   border: 1px solid #ded8cc;
   border-radius: 14px;
-  color: #151515;
   caret-color: #151515; }
 
 .login-dialog .login-dialog-prompt-entry:focus {
   border: 1px solid #6e6a62;
-  box-shadow: none; }
+  box-shadow: none !important; }
 
+.login-dialog .login-dialog-prompt-entry:insensitive {
+  color: #6e6a62 !important; }
+
+.login-dialog .login-dialog-prompt-entry StLabel.hint-text,
+.login-dialog StEntry StIcon.capslock-warning,
+.login-dialog StEntry StIcon.peek-password {
+  color: #6e6a62; }
+
+/* Round buttons (back arrow, session gear, accessibility): Yaru gives them a dark disc in every state */
+.login-dialog-button.cancel-button,
+.login-dialog-button.switch-user-button,
+.login-dialog-button.login-dialog-session-list-button,
+.login-dialog-button.a11y-button,
+.login-dialog-button.login-dialog-auth-menu-button {
+  background-color: #fbf8f1 !important;
+  color: #151515 !important;
+  border: 1px solid #ded8cc;
+  box-shadow: none !important; }
+
+.login-dialog-button.cancel-button:hover,
+.login-dialog-button.cancel-button:focus,
+.login-dialog-button.switch-user-button:hover,
+.login-dialog-button.switch-user-button:focus,
+.login-dialog-button.login-dialog-session-list-button:hover,
+.login-dialog-button.login-dialog-session-list-button:focus,
+.login-dialog-button.a11y-button:hover,
+.login-dialog-button.a11y-button:focus,
+.login-dialog-button.login-dialog-auth-menu-button:hover,
+.login-dialog-button.login-dialog-auth-menu-button:focus {
+  background-color: #e9e4d9 !important; }
+
+.login-dialog-button.cancel-button:active,
+.login-dialog-button.switch-user-button:active,
+.login-dialog-button.login-dialog-session-list-button:active,
+.login-dialog-button.a11y-button:active,
+.login-dialog-button.login-dialog-auth-menu-button:active {
+  background-color: #ded8cc !important; }
+
+/* the sign-in button keeps Loaf's ink */
 .login-dialog-button.default,
 .login-dialog .button.default {
   background-color: #151515;
   color: #fbf8f1; }
-
-.login-dialog-button.cancel-button,
-.login-dialog .button {
-  color: #151515; }

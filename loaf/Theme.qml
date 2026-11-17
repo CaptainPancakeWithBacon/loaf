@@ -8,10 +8,8 @@ import QtQuick
 Singleton {
     id: t
     property bool dark: false
-    // mako has no colour-scheme support: its config has a "dark" mode that we switch along
     // GTK3 apps follow gtk-theme, not color-scheme: keep them in step too
     onDarkChanged: {
-        Quickshell.execDetached(["makoctl", "mode", dark ? "-a" : "-r", "dark"])
         Quickshell.execDetached(["loaf-gtk-theme", dark ? "dark" : "light"])
     }
 

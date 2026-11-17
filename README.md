@@ -19,7 +19,8 @@ The numbers and the method are in `measurements/` and `tools/baseline.py`.
 - **Volume and brightness** on the F-keys with a small on-screen card; brightness goes through logind,
   no root needed.
 - **Light and dark** follow the system setting, and GTK3 apps and the login screen follow along.
-- **Notifications** by mako in Loaf's colours; **boot screen** and **login screen** in Loaf's style.
+- **Notifications** drawn by Loaf (cards over fullscreen apps too), with the ones you missed in quick
+  settings and a dot in the bar; low-battery warnings. **Boot screen** and **login screen** in Loaf's style.
 
 ## Install
 
@@ -72,7 +73,7 @@ Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
 - `boot/`: login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`); `session/loaf-system`
   switches them on and off
 - `packaging/build-deb.sh`: builds the .deb from `./install.sh --stage`; `packaging/build-iso.sh` the ISO
-- `mako/`, `fuzzel/`, `hypr/`: notifications, fallback launcher, idle and fallback lock
+- `fuzzel/`, `hypr/`: fallback launcher, idle and fallback lock
 - `tests/`, `tools/`, `measurements/`: a small test, the power baseline tool and its results
 
 Your own niri settings (screens, rules for your apps, extra autostarts) go in `~/.config/loaf/niri.kdl`;

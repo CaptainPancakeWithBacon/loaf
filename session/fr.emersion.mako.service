@@ -1,0 +1,6 @@
+# A notification sent before Loaf's shell is up would start mako directly over D-Bus, past the rule in
+# mako-loaf.conf. Going through systemd instead makes that rule apply.
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/usr/bin/mako
+SystemdService=mako.service
