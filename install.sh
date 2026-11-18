@@ -54,7 +54,7 @@ stage() {
     sed "s|@PREFIX@|$P|" "$here/session/loaf-login-scheme@.service" > $U/system/loaf-login-scheme@.service
 
     # login screen (logo, Yaru plus Loaf's colours, light and dark) and boot screen; loaf-system switches them on
-    install -m644 "$here/boot/loaf-login.png" $S/usr/share/pixmaps/
+    install -m644 "$here/boot/loaf-login.svg" $S/usr/share/pixmaps/
     ${SUDO_USER:+runuser -u "$SUDO_USER" --} "$here/boot/gdm/build.sh" >/dev/null
     install -m644 "$here/boot/gdm/build/light.gresource" "$here/boot/gdm/build/dark.gresource" $S/usr/share/gnome-shell/theme/Loaf/
     install -m644 "$here/boot/plymouth/loaf/"* $S/usr/share/plymouth/themes/loaf/

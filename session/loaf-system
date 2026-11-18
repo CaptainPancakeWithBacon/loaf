@@ -15,8 +15,9 @@ case $1 in
 activate)
     # logo under the user list (Ubuntu's own setting, commented out by default)
     if [ -f $G ]; then
-        cp -n $G $G.before-loaf
-        sed -i "s|^#logo=.*|logo='/usr/share/pixmaps/loaf-login.png'|" $G
+        [ -f $G.before-loaf ] || cp $G $G.before-loaf
+        # an SVG, so GDM draws it sharp at any screen scale (it scales a PNG up); also replaces the old PNG line
+        sed -i -e "s|^#logo=.*|logo='/usr/share/pixmaps/loaf-login.svg'|" -e "s|^logo='/usr/share/pixmaps/loaf-login.png'|logo='/usr/share/pixmaps/loaf-login.svg'|" $G
     fi
     # login theme: the active copy follows light/dark (loaf-login-scheme puts the right one in place).
     # Priority 30 wins over Ubuntu's (10) and Isobar's (25); deactivate puts the highest other one back.
@@ -35,7 +36,7 @@ activate)
     update-alternatives --set default.plymouth $T/loaf/loaf.plymouth
     initramfs ;;
 deactivate)
-    [ -f $G ] && sed -i "s|^logo='/usr/share/pixmaps/loaf-login.png'|#logo='/usr/share/images/vendor-logos/logo-text-version-64.png'|" $G
+    [ -f $G ] && sed -i "s|^logo='/usr/share/pixmaps/loaf-login.svg'|#logo='/usr/share/images/vendor-logos/logo-text-version-64.png'|" $G
     update-alternatives --remove gdm-theme.gresource $L/gnome-shell-theme.gresource 2>/dev/null || true
     rm -f $L/gnome-shell-theme.gresource
     update-alternatives --remove default.plymouth $T/loaf/loaf.plymouth 2>/dev/null || true
