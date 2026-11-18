@@ -1,4 +1,4 @@
-// Loaf quick settings: battery and watts, power menu, six tiles, volume and brightness.
+// Loaf quick settings: battery and watts, power menu, six tiles, volume, brightness and keyboard light.
 // Layout from Personal/Loaf/demo/still-demo.html (.quick). Everything reads services that push
 // changes (UPower, NetworkManager, BlueZ, PipeWire, power-profiles-daemon); nothing polls.
 // Brightness has no event source, so it is read when the card opens.
@@ -18,7 +18,7 @@ PanelWindow {
     property string detail: "" // "", "bt" or "wifi": the list under the tiles (right-click a tile, or its arrow)
     property var notifs: null  // Notifications.qml: do not disturb
     visible: open
-    onOpenChanged: { scan(); if (open) { powerMenu = false; detail = ""; brightRead.running = true } }
+    onOpenChanged: { scan(); if (open) { powerMenu = false; detail = ""; brightRead.running = true; kbdRead.running = true } }
     onDetailChanged: scan()
     // Wi-Fi scanning costs power: only while the network list is on screen
     function scan() { if (wifiDev) wifiDev.scannerEnabled = open && detail === "wifi" }
@@ -61,6 +61,16 @@ PanelWindow {
 
     Process { id: brightRead; command: ["brightnessctl", "-m", "--class=backlight"]
         stdout: StdioCollector { onStreamFinished: { const p = text.split(","); if (p.length > 3) win.bright = parseInt(p[3]) } } }
+    // Keyboard light: read when the card opens (the keys can change it too); none found, no slider
+    property string kbdName: ""; property int kbdMax: 0; property int kbd: 0
+    Process { id: kbdRead; command: ["brightnessctl", "-m", "-d", "*kbd_backlight"]
+        stdout: StdioCollector { onStreamFinished: { const p = text.trim().split(","); if (p.length > 4) { win.kbdName = p[0]; win.kbdMax = parseInt(p[4]); win.kbd = parseInt(p[3]) } } } }
+    // logind writes it for the person at the laptop, no root needed (as loaf-brightness does for the screen)
+    function setKbd(pct) {
+        kbd = pct
+        run(["busctl", "call", "org.freedesktop.login1", "/org/freedesktop/login1/session/auto", "org.freedesktop.login1.Session",
+             "SetBrightness", "ssu", "leds", kbdName, String(Math.round(kbdMax * pct / 100))])
+    }
     Process { id: mirror; command: ["loaf-mirror"] } // runs as long as the mirror is up
 
     function run(cmd) { Quickshell.execDetached(cmd) }
@@ -257,6 +267,11 @@ PanelWindow {
             Slider {
                 label: "Brightness"; minimum: 0.05; value: win.bright / 100
                 onMoved: v => { win.bright = Math.round(v * 100); win.run(["loaf-brightness", String(win.bright), "--no-osd"]) }
+            }
+            Slider {
+                visible: win.kbdName !== ""
+                label: "Keyboard light"; value: win.kbd / 100
+                onMoved: v => win.setKbd(Math.round(v * 100))
             }
         }
     }
