@@ -1,2 +1,3 @@
-# Loaf lock: fingerprint only (runs next to loaf-password). 300 s per round, the lock restarts it.
-auth required pam_fprintd.so max-tries=3 timeout=300
+# Loaf lock: fingerprint only (runs next to loaf-password). No timeout: it listens for as long as the
+# screen is locked (a timeout used to count as a failure and switch the finger off for a while).
+auth required pam_fprintd.so max-tries=3 timeout=-1

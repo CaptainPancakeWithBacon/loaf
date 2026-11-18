@@ -144,7 +144,7 @@ Scope {
         }
     }
 
-    // Finger: restarts after a timeout or 3 misses for as long as the screen is locked.
+    // Finger: listens without a time limit (pam/loaf-finger), restarts after 3 misses while the screen is locked.
     PamContext {
         id: finger
         configDirectory: root.pamDir; config: "loaf-finger"
