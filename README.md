@@ -113,6 +113,7 @@ Your own niri settings (screens and their refresh rates, rules for your apps, ex
 | `boot/` | login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`) |
 | `packaging/` | the `.deb` and the installer ISO |
 | `site/` | the website, a page that naps |
+| `claude-theme/` | Loaf for the Claude app: paper and ink, the napping cat, bread words while it works (a Claude Code mod) |
 | `measurements/`, `tools/` | the power measurements and the tool that takes them |
 
 ## Credits
