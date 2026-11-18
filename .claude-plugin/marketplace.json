@@ -1,0 +1,5 @@
+{
+  "name": "loaf",
+  "owner": { "name": "CaptainPancakeWithBacon" },
+  "plugins": [{ "name": "loaf-theme", "source": "./claude-theme", "description": "Loaf for the Claude app: paper and ink, the napping cat behind the conversation, bread words while it works." }]
+}

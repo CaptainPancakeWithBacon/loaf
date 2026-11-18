@@ -103,6 +103,19 @@ Your own niri settings (screens and their refresh rates, rules for your apps, ex
 `~/.config/loaf/niri.kdl`. Loaf's config includes it last, so it can override anything. The shell logs to
 `~/.cache/loaf/qs.log`.
 
+## Loaf for Claude
+
+A theme for the Claude app in Loaf's look: paper and ink with no accent colour, the cat napping behind the
+conversation, and bread words while it works (*Proofing*, *Kneading*, *Baking*). Light and dark follow the app.
+In a terminal session of Claude Code:
+
+```
+/plugin install loaf-theme --marketplace CaptainPancakeWithBacon/loaf
+```
+
+From a shell: `claude plugin install loaf-theme --marketplace CaptainPancakeWithBacon/loaf`. In the desktop app:
+click + next to the prompt box, then Plugins, Add marketplace with `CaptainPancakeWithBacon/loaf`, then Add plugin.
+
 ## Inside the repository
 
 | Folder | What |
