@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loaf: a desktop that naps</title>
+<meta name="description" content="Loaf is a quiet desktop for Linux laptops. Nothing moves when you are not looking, so the battery goes to your work.">
+<meta name="theme-color" content="#F1EDE4">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cg transform='translate(0 15)' fill='%23151515'%3E%3Cpath d='M72 112 C67 84 73 60 86 42 C100 56 112 70 118 82 Z'/%3E%3Cpath d='M184 112 C189 84 183 60 170 42 C156 56 144 70 138 82 Z'/%3E%3Cpath d='M64 134 C62 102 88 80 128 80 C168 80 194 102 192 134 C194 160 176 180 128 184 C80 180 62 160 64 134 Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..800,0..1,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ground: #F1EDE4; --sheet: #FBF8F1; --line: #DED8CC; --ink: #151515; --mute: #6E6A62; --faint: #A09A8F;
+  --amber: #E2B04A;
+  --casual: "CASL" 1, "MONO" 0;
+  --linear: "CASL" 0, "MONO" 0;
+  --mono: "CASL" 0, "MONO" 1;
+  color-scheme: light;
+}
+/* asleep: Loaf's own night colours */
+html.asleep {
+  --ground: #121212; --sheet: #1C1C1B; --line: #2E2E2C; --ink: #ECECEA; --mute: #A3A39E; --faint: #5A5A57;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ground); transition: background-color 1.6s ease; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: "Recursive", system-ui, sans-serif; font-variation-settings: var(--linear);
+  font-size: 18px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  transition: background-color 1.6s ease, color 1.6s ease;
+}
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
+.wrap { width: min(1160px, 100% - 48px); margin-inline: auto; }
+
+/* ---- top ---- */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding: 26px 0; }
+.wordmark { height: 30px; width: auto; display: block; }
+.wordmark path { fill: var(--ink); transition: fill 1.6s ease; }
+.top nav { display: flex; gap: 28px; font-size: 16px; }
+.top nav a { text-decoration: none; color: var(--mute); }
+.top nav a:hover { color: var(--ink); }
+
+/* ---- hero ---- */
+.hero { display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 40px; min-height: min(78vh, 760px); padding: 20px 0 60px; }
+h1 {
+  margin: 0; font-weight: 750; font-size: clamp(56px, 9.5vw, 136px); line-height: 0.9; letter-spacing: -0.045em;
+  font-variation-settings: var(--casual), "slnt" 0;
+}
+.lede { margin: 30px 0 0; max-width: 31ch; font-size: 21px; color: var(--mute); transition: color 1.6s ease; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; margin-top: 40px; }
+.button {
+  display: inline-block; text-decoration: none; background: var(--ink); color: var(--ground);
+  padding: 16px 26px; border-radius: 999px; font-weight: 600; font-size: 17px;
+  transition: background-color 1.6s ease, color 1.6s ease;
+}
+.quiet-link { color: var(--mute); font-size: 17px; }
+
+.cat-stage { position: relative; display: grid; place-items: center; }
+.cat { width: min(100%, 520px); height: auto; overflow: visible; }
+.cat .head { fill: var(--ink); transition: fill 1.6s ease; }
+.cat .eye { fill: var(--amber); }
+.cat .pupil { fill: var(--ink); transition: fill 1.6s ease; }
+.cat .eyes { transform-box: fill-box; transform-origin: center; transition: transform 1.2s cubic-bezier(.5,0,.2,1), opacity 0.4s ease 0.8s; }
+html.asleep .cat .eyes { transform: scaleY(0); opacity: 0; }
+/* closed lids: two soft curves, drawn in the background colour on the head, appear as the eyes shut */
+.cat .lids { fill: none; stroke: var(--ground); stroke-width: 4.5; stroke-linecap: round; opacity: 0;
+  transition: opacity 0.5s ease, stroke 1.6s ease; }
+html.asleep .cat .lids { opacity: 1; transition: opacity 0.5s ease 0.85s, stroke 1.6s ease; }
+.zzz {
+  position: absolute; top: 4%; right: 12%; font-size: 34px; color: var(--faint);
+  font-variation-settings: var(--casual), "slnt" -15; opacity: 0; transition: opacity 1.2s ease 0.9s;
+}
+html.asleep .zzz { opacity: 1; }
+
+/* ---- nap note (bottom left, only while asleep) ---- */
+.napnote {
+  position: fixed; right: 24px; bottom: 22px; max-width: min(46ch, calc(100% - 48px)); text-align: right; font-size: 14px; color: var(--mute);
+  font-variation-settings: var(--mono); opacity: 0; transition: opacity 0.8s ease; pointer-events: none;
+}
+html.asleep .napnote { opacity: 1; }
+
+/* ---- sections ---- */
+section { padding: 110px 0; }
+h2 {
+  margin: 0 0 18px; font-weight: 700; font-size: clamp(34px, 4.6vw, 58px); line-height: 1.02; letter-spacing: -0.03em;
+  font-variation-settings: var(--casual), "slnt" 0;
+}
+.intro { max-width: 58ch; color: var(--mute); margin: 0; transition: color 1.6s ease; }
+
+/* battery timeline: hours of idle on one charge */
+.timeline { margin-top: 70px; }
+.track { position: relative; height: 2px; background: var(--line); margin: 0 0 18px; transition: background-color 1.6s ease; }
+.run { position: relative; height: 54px; margin-bottom: 26px; }
+.run .bar { position: absolute; left: 0; top: 0; height: 54px; border-radius: 999px; }
+.run.gnome .bar { width: calc(9.0 / 12 * 100%); border: 1.5px solid var(--faint); }
+.run.loaf .bar { width: calc(11.4 / 12 * 100%); background: var(--ink); transition: background-color 1.6s ease; }
+.run .who { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); font-weight: 600; font-size: 17px; }
+.run.gnome .who { color: var(--mute); }
+.run.loaf .who { color: var(--ground); transition: color 1.6s ease; }
+.run .hrs { position: absolute; top: 50%; transform: translateY(-50%); font-size: 16px; white-space: nowrap; font-variation-settings: var(--mono); }
+.run.gnome .hrs { right: calc(100% - 9.0 / 12 * 100% + 22px); color: var(--mute); }
+.run.loaf .hrs { right: calc(100% - 11.4 / 12 * 100% + 22px); color: var(--ground); transition: color 1.6s ease; }
+.scale { display: flex; justify-content: space-between; font-size: 13px; color: var(--faint); font-variation-settings: var(--mono); }
+.footnote { margin-top: 28px; font-size: 15px; color: var(--mute); max-width: 70ch; }
+
+/* the bar, enlarged */
+.barview { margin-top: 64px; overflow-x: auto; padding-bottom: 6px; }
+.lbar {
+  min-width: 860px; height: 76px; border-radius: 22px; background: var(--sheet); border: 1px solid var(--line);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 30px; font-size: 26px;
+  transition: background-color 1.6s ease, border-color 1.6s ease;
+}
+.lbar .left, .lbar .right { display: flex; align-items: center; gap: 22px; }
+.lbar .right { justify-content: flex-end; }
+.lbar .dots { display: flex; gap: 8px; align-items: center; }
+.lbar .dots i { display: block; width: 13px; height: 13px; border-radius: 99px; background: var(--faint); }
+.lbar .dots i.on { width: 40px; background: var(--ink); }
+.lbar .date { color: var(--mute); margin-right: 14px; }
+.lbar .time { font-weight: 600; }
+.lbar .watts { color: var(--mute); font-variation-settings: var(--mono); font-size: 23px; }
+.lbar svg { display: block; }
+.notes { min-width: 860px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; margin-top: 26px; font-size: 16px; color: var(--mute); }
+.notes p { margin: 0; }
+.notes b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 4px; }
+.notes .mid { text-align: center; }
+.notes .end { text-align: right; }
+
+/* principles: plain sentences, one per line */
+.still { margin-top: 56px; display: grid; gap: 0; }
+.still p {
+  margin: 0; padding: 22px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(180px, 0.9fr) 2fr; gap: 30px;
+  transition: border-color 1.6s ease;
+}
+.still p:last-child { border-bottom: 1px solid var(--line); }
+.still b { font-weight: 650; font-variation-settings: var(--casual); }
+.still span { color: var(--mute); }
+
+/* install */
+.ways { margin-top: 56px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.ways > div { min-width: 0; } /* let long commands scroll inside their block */
+.ways h3 { margin: 0 0 8px; font-size: 22px; font-weight: 650; font-variation-settings: var(--casual); }
+.ways p { margin: 0 0 16px; color: var(--mute); font-size: 16px; }
+pre {
+  margin: 0; padding: 16px 18px; border-radius: 14px; background: var(--sheet); border: 1px solid var(--line);
+  font-family: inherit; font-variation-settings: var(--mono); font-size: 14px; line-height: 1.55; overflow-x: auto;
+  transition: background-color 1.6s ease, border-color 1.6s ease;
+}
+
+footer { padding: 70px 0 110px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; color: var(--mute); font-size: 15px; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; min-height: 0; padding-top: 10px; }
+  .cat-stage { order: -1; }
+  .cat { width: min(70%, 320px); }
+  section { padding: 76px 0; }
+  .ways { grid-template-columns: 1fr; gap: 34px; }
+  .still p { grid-template-columns: 1fr; gap: 4px; }
+  .top nav { gap: 18px; font-size: 15px; }
+  .run .hrs { font-size: 13px; }
+  .run .who { font-size: 15px; left: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="#" aria-label="Loaf"><svg class="wordmark" viewBox="14 24 300 136" role="img" aria-label="loaf"><path transform="translate(0 0) scale(0.66)" d="M 40 42 A 14 14 0 0 0 26 56 L 26 224 A 14 14 0 0 0 40 238 A 14 14 0 0 0 54 224 L 54 56 A 14 14 0 0 0 40 42 z M 456 42 C 424.13331 42 398 68.133309 398 100 L 398 110 L 386 110 A 14 14 0 0 0 372 124 A 14 14 0 0 0 386 138 L 398 138 L 398 224 A 14 14 0 0 0 412 238 A 14 14 0 0 0 426 224 L 426 138 L 444 138 A 14 14 0 0 0 458 124 A 14 14 0 0 0 444 110 L 426 110 L 426 100 C 426 83.265633 439.26563 70 456 70 A 14 14 0 0 0 470 56 A 14 14 0 0 0 456 42 z M 104 70 L 100.13867 110.54688 C 81.95708 123.22462 70 144.28587 70 168 C 70 206.49411 101.50589 238 140 238 C 178.49411 238 210 206.49411 210 168 C 210 144.28587 198.04292 123.22462 179.86133 110.54688 L 176 70 L 148 98 L 149.46875 98.642578 C 146.37025 98.21865 143.2099 98 140 98 C 136.7901 98 133.62975 98.21865 130.53125 98.642578 L 132 98 L 104 70 z M 300 98 C 261.50589 98 230 129.50589 230 168 C 230 206.49411 261.50589 238 300 238 C 315.72269 238 330.27957 232.74377 342 223.90234 L 342 224 A 14 14 0 0 0 356 238 A 14 14 0 0 0 370 224 L 370 112 A 14 14 0 0 0 356 98 A 14 14 0 0 0 342 112 L 342 112.09766 C 330.27957 103.25623 315.72269 98 300 98 z M 140 126 C 163.36178 126 182 144.63822 182 168 C 182 191.36178 163.36178 210 140 210 C 116.63822 210 98 191.36178 98 168 C 98 144.63822 116.63822 126 140 126 z M 300 126 C 323.36178 126 342 144.63822 342 168 C 342 191.36178 323.36178 210 300 210 C 276.63822 210 258 191.36178 258 168 C 258 144.63822 276.63822 126 300 126 z "/></svg></a>
+    <nav>
+      <a href="#battery">Battery</a>
+      <a href="#inside">Inside</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/CaptainPancakeWithBacon/loaf">Source</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>A desktop that naps.</h1>
+        <p class="lede">Loaf is a quiet desktop for Linux laptops. Nothing moves when you are not looking, so the battery goes to your work instead of the desktop.</p>
+        <div class="actions">
+          <a class="button" href="#install">Get Loaf</a>
+          <a class="quiet-link" href="https://github.com/CaptainPancakeWithBacon/loaf">Read the source</a>
+        </div>
+      </div>
+      <div class="cat-stage" aria-hidden="true">
+        <svg class="cat" viewBox="40 40 176 176">
+          <g transform="translate(0 15)">
+            <path class="head" d="M72 112 C67 84 73 60 86 42 C100 56 112 70 118 82 Z"/>
+            <path class="head" d="M184 112 C189 84 183 60 170 42 C156 56 144 70 138 82 Z"/>
+            <path class="head" d="M64 134 C62 102 88 80 128 80 C168 80 194 102 192 134 C194 160 176 180 128 184 C80 180 62 160 64 134 Z"/>
+            <g class="eyes">
+              <ellipse class="eye" cx="104" cy="132" rx="13" ry="11"/>
+              <ellipse class="eye" cx="152" cy="132" rx="13" ry="11"/>
+              <ellipse class="pupil" cx="104" cy="132" rx="3.6" ry="9"/>
+              <ellipse class="pupil" cx="152" cy="132" rx="3.6" ry="9"/>
+            </g>
+            <path class="lids" d="M91 131 Q104 141 117 131 M139 131 Q152 141 165 131"/>
+          </g>
+        </svg>
+        <span class="zzz">z z</span>
+      </div>
+    </div>
+
+    <section id="battery">
+      <h2>An evening more on one charge.</h2>
+      <p class="intro">Same laptop, same screen brightness, nothing open, measured from what the battery itself reports. GNOME's desktop keeps itself busy; Loaf's waits for something to happen.</p>
+      <div class="timeline" role="img" aria-label="Idle time on a full 57 watt-hour battery: GNOME about 9 hours at 6.3 watts, Loaf about 10.4 to 11.4 hours at 5.0 to 5.5 watts.">
+        <div class="run gnome"><div class="bar"></div><span class="who">GNOME</span><span class="hrs">9 hours at 6.3 W</span></div>
+        <div class="run loaf"><div class="bar"></div><span class="who">Loaf</span><span class="hrs">10½ to 11½ hours at 5.0 to 5.5 W</span></div>
+        <div class="track"></div>
+        <div class="scale"><span>0 h</span><span>3 h</span><span>6 h</span><span>9 h</span><span>12 h</span></div>
+      </div>
+      <p class="footnote">Idle on a Framework 13 (AMD Ryzen AI 300), 57 Wh battery. The method and the raw numbers are in the repository, under <a href="https://github.com/CaptainPancakeWithBacon/loaf/tree/main/measurements">measurements</a>.</p>
+    </section>
+
+    <section id="inside">
+      <h2>One bar, and nothing else running.</h2>
+      <p class="intro">Everything you need from a desktop lives in a single strip along the top. It only redraws when something changes: a new minute, a new notification, a few percent of battery.</p>
+      <div class="barview">
+        <div class="lbar" aria-hidden="true">
+          <div class="left">
+            <svg width="34" height="34" viewBox="40 40 176 176"><g transform="translate(0 15)" fill="currentColor"><path d="M72 112 C67 84 73 60 86 42 C100 56 112 70 118 82 Z"/><path d="M184 112 C189 84 183 60 170 42 C156 56 144 70 138 82 Z"/><path fill-rule="evenodd" d="M64 134 C62 102 88 80 128 80 C168 80 194 102 192 134 C194 160 176 180 128 184 C80 180 62 160 64 134 Z M91 132 A13 11 0 1 0 117 132 A13 11 0 1 0 91 132 Z M139 132 A13 11 0 1 0 165 132 A13 11 0 1 0 139 132 Z"/></g></svg>
+            <span class="dots"><i class="on"></i><i></i><i></i></span>
+          </div>
+          <div><span class="date">Wed 18 Nov</span><span class="time">09:41</span></div>
+          <div class="right">
+            <svg width="30" height="30" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4.82 10.82 A4.5 4.5 0 0 1 11.18 10.82"/><path d="M2.34 8.34 A8 8 0 0 1 13.66 8.34"/><path d="M-.13 5.87 A11.5 11.5 0 0 1 16.13 5.87"/><circle cx="8" cy="14" r="1.6" fill="currentColor" stroke="none"/></svg>
+            <span class="watts">5.1 W · 7h 40m</span>
+            <svg width="44" height="24" viewBox="0 0 22 12"><rect x="0.65" y="0.65" width="17.7" height="10.7" rx="3" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2.5" y="2.5" width="11" height="7" rx="1.5" fill="currentColor"/><rect x="19.8" y="4" width="1.8" height="4" rx="1" fill="currentColor"/></svg>
+            <span>72%</span>
+          </div>
+        </div>
+        <div class="notes">
+          <p><b>The cat opens everything</b>Apps, settings and files in one search. Super+D does the same.</p>
+          <p class="mid"><b>The clock keeps your notifications</b>Missed something while you were away? It is under the time, with a dot until you look.</p>
+          <p class="end"><b>The right side is your laptop</b>Wi-Fi, watts, time left and battery. Click it for quick settings and the power menu.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>When you stop, it stops.</h2>
+      <div class="still">
+        <p><b>The clock</b><span>ticks once a minute, not once a second.</span></p>
+        <p><b>Wi-Fi</b><span>only looks for networks while the list of networks is open.</span></p>
+        <p><b>Notifications</b><span>wait quietly until an app sends one. Nothing checks in the background.</span></p>
+        <p><b>The lock screen</b><span>takes your finger or your password, and lets the laptop sleep at about 0.65 W: one percent an hour.</span></p>
+        <p><b>Light and dark</b><span>follow your system setting. Your apps, the login screen and the boot screen come along.</span></p>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Try it next to what you have.</h2>
+      <p class="intro">Loaf is a second login choice next to GNOME. If it is not for you, log out and pick GNOME again; nothing of yours changes.</p>
+      <div class="ways">
+        <div>
+          <h3>A new laptop</h3>
+          <p>Build the installer: Ubuntu 26.04 with Loaf already in it. Ubuntu's own installer, nothing else changed.</p>
+          <pre>packaging/build-iso.sh</pre>
+        </div>
+        <div>
+          <h3>Your Ubuntu laptop</h3>
+          <p>Build the package and install it. Removing it puts Ubuntu's login and boot screen back.</p>
+          <pre>packaging/build-deb.sh
+sudo apt install ./packaging/out/loaf_*.deb</pre>
+        </div>
+        <div>
+          <h3>From the source</h3>
+          <p>For every user on the computer, with an undo. Works from a clone of the repository.</p>
+          <pre>sudo ./install.sh --system</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Loaf runs on <a href="https://github.com/YaLTeR/niri">niri</a> and <a href="https://quickshell.org">Quickshell</a>. Its own code is MIT licensed.</span>
+    <span>Made on a Framework 13, mostly while it napped.</span>
+  </footer>
+</div>
+
+<p class="napnote" aria-live="polite"></p>
+
+<script>
+// The page naps like Loaf: after 8 s without input it switches to night and the cat closes its eyes.
+// Nothing runs while it sleeps except one timer per minute for the note, like Loaf's clock.
+(() => {
+  const root = document.documentElement, note = document.querySelector(".napnote");
+  let idle = null, minuteTimer = null, since = 0;
+  const minutes = () => Math.floor((Date.now() - since) / 60000);
+  const say = () => {
+    const m = minutes();
+    note.textContent = m === 0 ? "Asleep. Move to wake it." : `Asleep for ${m} min. This line updates once a minute, like Loaf's clock.`;
+  };
+  const sleep = () => {
+    root.classList.add("asleep"); since = Date.now(); say();
+    const tick = () => { say(); minuteTimer = setTimeout(tick, 60000 - ((Date.now() - since) % 60000)); };
+    minuteTimer = setTimeout(tick, 60000);
+  };
+  const wake = () => {
+    clearTimeout(idle); clearTimeout(minuteTimer);
+    root.classList.remove("asleep");
+    idle = setTimeout(sleep, 8000);
+  };
+  for (const e of ["pointermove", "pointerdown", "keydown", "scroll", "wheel", "touchstart", "focusin"])
+    addEventListener(e, wake, { passive: true });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
+  wake();
+})();
+</script>
+</body>
+</html>

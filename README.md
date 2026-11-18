@@ -1,87 +1,121 @@
-# Loaf
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/loaf-dark.svg">
+    <img src="docs/loaf-light.svg" alt="Loaf" width="300">
+  </picture>
+</p>
 
-A desktop that naps. Loaf is a quiet shell for [niri](https://github.com/YaLTeR/niri) on a laptop:
-nothing moves when you are not looking, so the battery goes to your work instead of the desktop.
-It is a second login session next to GNOME; GNOME stays one logout away.
+<h3 align="center">A desktop that naps.</h3>
 
-Measured on a Framework 13 (Ryzen AI 300), idle, same conditions: GNOME 6.3 W, Loaf about 5.0 to 5.5 W.
-The numbers and the method are in `measurements/` and `tools/baseline.py`.
+<p align="center">
+  A quiet desktop for Linux laptops, built on <a href="https://github.com/YaLTeR/niri">niri</a>.<br>
+  Nothing moves when you are not looking, so the battery goes to your work instead of the desktop.<br>
+  It sits next to GNOME as a second login choice; GNOME stays one logout away.
+</p>
+
+<br>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/battery-dark.svg">
+    <img src="docs/battery-light.svg" alt="Idle on a full 57 Wh battery: GNOME about 9 hours at 6.3 W, Loaf about 10.5 to 11.5 hours at 5.0 to 5.5 W" width="720">
+  </picture>
+</p>
+
+<p align="center"><sub>Same laptop, same brightness, nothing open. Method and raw numbers in <a href="measurements/"><code>measurements/</code></a> and <a href="tools/baseline.py"><code>tools/baseline.py</code></a>.</sub></p>
+
+## When you stop, it stops
+
+| Part | While you are not using it |
+|---|---|
+| **The clock** | ticks once a minute, not once a second |
+| **Wi-Fi** | only looks for networks while the list of networks is open |
+| **Notifications** | wait until an app sends one; nothing checks in the background |
+| **Sleep** | about 0.65 W, one percent of battery an hour |
+| **Login** | five of Ubuntu's background helpers are skipped in Loaf (GNOME keeps them) |
 
 ## What is in it
 
-- **Bar** (`loaf/Bar.qml`): the cat (opens the launcher), workspace dots, date and time, Wi-Fi, watts and battery.
-  The clock ticks once a minute; everything else follows events, nothing polls.
-- **Launcher** (Super+D): apps, settings and files in one search; focuses an app that is already open.
-- **Quick settings** (click the right side of the bar): battery with time left, power menu, Wi-Fi and
-  Bluetooth lists, power saver, dark style, do not disturb, screen mirroring, volume and brightness.
-- **Lock screen** (`loaf/Lock.qml`): finger or password, on every screen. The fingerprint reader recovers
-  by itself after a suspend (see `session/50-loaf-fprintd.rules`).
-- **Volume and brightness** on the F-keys with a small on-screen card; brightness goes through logind,
-  no root needed.
-- **Light and dark** follow the system setting, and GTK3 apps and the login screen follow along.
-- **Notifications** drawn by Loaf (cards over fullscreen apps too), with the ones you missed in quick
-  settings and a dot in the bar; low-battery warnings. **Boot screen** and **login screen** in Loaf's style.
+- **The bar.** The cat opens the launcher, then workspace dots, the date and time, and on the right Wi-Fi
+  (with signal strength, a plug on a cable), watts in or out, time to empty or full, and the battery.
+- **Launcher** (Super+D). Apps, settings and files in one search; an app that is already open gets focused.
+- **Notifications.** Cards in the corner, also over fullscreen windows. Missed one? Click the date and time:
+  they wait there, with a dot next to the clock until you look. Do not disturb lets only urgent ones through.
+- **Quick settings** (the right side of the bar). Battery with time left, the power menu, Wi-Fi and Bluetooth
+  lists, power saver, dark style, do not disturb, screen mirroring, volume and brightness.
+- **Lock screen.** Your finger or your password, on every screen. Without a fingerprint reader it simply asks
+  for the password; with one, it recovers by itself after a suspend.
+- **Light and dark** follow your system setting, and GTK apps, the login screen and the boot screen come along.
+- **A low-battery warning** at 20%, and one that stays at 10% and 5%.
 
 ## Install
 
-As a package (Ubuntu 26.04): build it with `packaging/build-deb.sh`, then
+Loaf is for Ubuntu 26.04 on a laptop. Every way below adds "Loaf" to the login screen next to GNOME and gives the
+login and boot screen Loaf's look; taking Loaf off puts Ubuntu's back.
+
+**On a new laptop: the installer.** `packaging/build-iso.sh` takes Ubuntu's own 26.04.1 desktop ISO (put it and
+Ubuntu's `SHA256SUMS` in `iso/`) and adds Loaf plus everything it needs, so installing works offline. Ubuntu's
+installer asks all its usual questions; at the end it installs Loaf and starts your new account on it.
+Runs in Docker, no sudo.
+
+**On your Ubuntu laptop: the package.**
 
 ```sh
+packaging/build-deb.sh
 sudo apt install ./packaging/out/loaf_*.deb
 ```
 
-As an installer ISO: `packaging/build-iso.sh` takes Ubuntu's own 26.04.1 desktop ISO (put it and Ubuntu's
-`SHA256SUMS` in `iso/`) and adds two things: `/loaf`, the package plus the packages it needs that Ubuntu does not
-install (so installing works offline), and `/autoinstall.yaml`. Ubuntu's installer still asks all its usual
-questions; at the end it installs Loaf and starts the new account on it. Runs in Docker, no sudo.
-
-Or straight from the repo, for every user on the computer, with an undo:
+**From the repository**, for every user on the computer, with an undo:
 
 ```sh
 sudo ./install.sh --system
-sudo ./install.sh --system-undo
+sudo ./install.sh --system-undo   # takes it all off again
 ```
 
-Both add "Loaf" to the login screen next to GNOME and switch the login and boot screen to Loaf's;
-removing the package or `--system-undo` puts Ubuntu's back. For working on Loaf itself, `./install.sh`
-(no sudo) links the repo into your home folder, which wins over the system copy.
+For working on Loaf itself, `./install.sh` (no sudo) links the repository into your home folder, which wins over
+the system copy.
 
-Build first (sources go in `src/`, ignored): niri v26.04 and xwayland-satellite v0.8.3 with
-`cargo build --release`, Quickshell 0.3.2 with
-`cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release -DCRASH_HANDLER=OFF`.
-Clone niri with the git-lfs filter disabled (its LFS files are screenshots).
+<details>
+<summary>Building niri, xwayland-satellite and Quickshell first</summary>
+
+The sources go in `src/` (ignored by git). niri v26.04 and xwayland-satellite v0.8.3 build with
+`cargo build --release`; Quickshell 0.3.2 with
+`cmake -GNinja -B build -DCMAKE_BUILD_TYPE=Release -DCRASH_HANDLER=OFF`. Clone niri with the git-lfs filter
+disabled (its LFS files are screenshots).
+</details>
 
 ## Keys
 
 | Key | Does |
 |---|---|
 | Super+D | Launcher |
-| Super+Shift+D | fuzzel, the fallback launcher |
+| Super+T | Terminal (`$TERMINAL`, else the first of Ghostty, Console, GNOME Terminal, foot, Alacritty, kitty, xterm) |
 | Super+X | Power menu |
+| Super+Alt+L | Lock |
 | Super+P | Mirror to an external screen |
 | Super+Shift+S | Screenshot of an area |
-| Super+Alt+L | Lock |
-| Super+T | Terminal (`$TERMINAL`, else the first of Ghostty, Console, GNOME Terminal, foot, Alacritty, kitty, xterm) |
+| Super+Shift+D | fuzzel, the fallback launcher |
 | Super+Shift+E | Log out |
 
-## Layout
+## Make it yours
 
-- `loaf/`: the Quickshell shell (bar, launcher, quick settings, lock, on-screen card, theme, logo files)
-- `niri/make-config.py`: builds `~/.config/niri/config.kdl` from niri's own default config with a few exact
-  substitutions; it fails loudly when one no longer matches
-- `session/`: login wrapper (niri runs as `niri.service`, needed for the portals), helper scripts, units
-- `boot/`: login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`); `session/loaf-system`
-  switches them on and off
-- `packaging/build-deb.sh`: builds the .deb from `./install.sh --stage`; `packaging/build-iso.sh` the ISO
-- `fuzzel/`, `hypr/`: fallback launcher, idle and fallback lock
-- `tests/`, `tools/`, `measurements/`: a small test, the power baseline tool and its results
+Your own niri settings (screens and their refresh rates, rules for your apps, extra things to start) go in
+`~/.config/loaf/niri.kdl`. Loaf's config includes it last, so it can override anything. The shell logs to
+`~/.cache/loaf/qs.log`.
 
-Your own niri settings (screens, rules for your apps, extra autostarts) go in `~/.config/loaf/niri.kdl`;
-Loaf's config includes it last when it exists, so it can override anything.
+## Inside the repository
 
-Quickshell logs to `~/.cache/loaf/qs.log`.
+| Folder | What |
+|---|---|
+| `loaf/` | the shell (Quickshell): bar, launcher, quick settings, notifications, lock, theme, logo files |
+| `niri/make-config.py` | builds Loaf's niri config from niri's own default with a few exact changes; fails loudly when one no longer fits |
+| `session/` | starting the session (niri runs as `niri.service`, which the portals need), helper scripts, system rules |
+| `boot/` | login logo, login screen theme (`boot/gdm/`), boot screen (`boot/plymouth/`) |
+| `packaging/` | the `.deb` and the installer ISO |
+| `site/` | the website, a page that naps |
+| `measurements/`, `tools/` | the power measurements and the tool that takes them |
 
 ## Credits
 
-Loaf runs on [niri](https://github.com/YaLTeR/niri) (GPL-3.0) and
-[Quickshell](https://quickshell.org) (LGPL-3.0). Loaf's own code is MIT, see `LICENSE`.
+Loaf runs on [niri](https://github.com/YaLTeR/niri) (GPL-3.0) and [Quickshell](https://quickshell.org)
+(LGPL-3.0). Loaf's own code is MIT, see [`LICENSE`](LICENSE). Made on a Framework 13, mostly while it napped.
