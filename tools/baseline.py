@@ -15,11 +15,12 @@ Run it detached so the Claude window is idle, with the screen kept on:
 (in GNOME use gnome-session-inhibit --inhibit idle:suspend instead of systemd-inhibit)
 Results are appended to measurements/baseline.tsv.
 """
-import os, signal, subprocess, sys, time, datetime, pathlib
+import glob, os, signal, subprocess, sys, time, datetime, pathlib
 
 BAT = "/sys/class/power_supply/BAT1"
-GPU = "/sys/class/drm/card0/device/gpu_busy_percent"
-BL = "amdgpu_bl0"
+# looked up, not fixed: the numbers change between boots and kernels (card0/amdgpu_bl0 became card1/amdgpu_bl1)
+GPU = sorted(glob.glob("/sys/class/drm/card*/device/gpu_busy_percent"))[0]
+BL = sorted(os.listdir("/sys/class/backlight"))[0]
 BL_DIR = f"/sys/class/backlight/{BL}"
 HZ = os.sysconf("SC_CLK_TCK")
 OUT = pathlib.Path(__file__).resolve().parent.parent / "measurements" / "baseline.tsv"

@@ -9,3 +9,5 @@ date	session	case	compositor	quickshell	xwayland	coucou	machine_busy	gpu_busy	wa
 2026-11-12 14:22	niri	no coucou, no bar	0.37	0.00	0.00	0.00	1.42	0.14	5.48	50	power-saver
 2026-11-14 22:59	niri	ubuntu extras off	7.94	0.06	0.00	0.00	4.37	1.00	6.46	50	power-saver
 2026-11-14 23:07	niri	ubuntu extras on (as is)	0.53	0.03	0.00	0.00	1.31	1.00	5.46	50	power-saver
+2026-11-19 11:33	niri	NOT VALID (external USB-C screen, Claude window busy): usb autosuspend + services trimmed	5.92	0.22	0.00	0.00	4.38	1.73	7.27	50	power-saver
+2026-11-22 11:48	niri	week 1 end: usb autosuspend + services trimmed	0.14	0.19	0.06	0.00	1.35	0.00	4.73	50	power-saver
