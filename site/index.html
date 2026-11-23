@@ -91,19 +91,22 @@ h2 {
 }
 .intro { max-width: 58ch; color: var(--mute); margin: 0; transition: color 1.6s ease; }
 
-/* battery timeline: hours of idle on one charge */
+/* battery timeline: hours on one charge, in use and idle; --h is the hours, the axis runs to 15 */
 .timeline { margin-top: 70px; }
 .track { position: relative; height: 2px; background: var(--line); margin: 0 0 18px; transition: background-color 1.6s ease; }
-.run { position: relative; height: 54px; margin-bottom: 26px; }
-.run .bar { position: absolute; left: 0; top: 0; height: 54px; border-radius: 999px; }
-.run.gnome .bar { width: calc(9.0 / 12 * 100%); border: 1.5px solid var(--faint); }
-.run.loaf .bar { width: calc(11.4 / 12 * 100%); background: var(--ink); transition: background-color 1.6s ease; }
+.group { font-size: 15px; color: var(--mute); margin: 0 0 12px; }
+.run + .group { margin-top: 34px; }
+.run { position: relative; height: 50px; margin-bottom: 14px; }
+.run .bar { position: absolute; left: 0; top: 0; height: 50px; width: calc(var(--h) / 15 * 100%); border-radius: 999px; }
+.run.gnome .bar { border: 1.5px solid var(--faint); }
+.run.loaf .bar { background: var(--ink); transition: background-color 1.6s ease; }
 .run .who { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); font-weight: 600; font-size: 17px; }
 .run.gnome .who { color: var(--mute); }
 .run.loaf .who { color: var(--ground); transition: color 1.6s ease; }
-.run .hrs { position: absolute; top: 50%; transform: translateY(-50%); font-size: 16px; white-space: nowrap; font-variation-settings: var(--mono); }
-.run.gnome .hrs { right: calc(100% - 9.0 / 12 * 100% + 22px); color: var(--mute); }
-.run.loaf .hrs { right: calc(100% - 11.4 / 12 * 100% + 22px); color: var(--ground); transition: color 1.6s ease; }
+.run .hrs { position: absolute; top: 50%; transform: translateY(-50%); right: calc(100% - var(--h) / 15 * 100% + 22px); font-size: 16px; white-space: nowrap; font-variation-settings: var(--mono); }
+.run.gnome .hrs { color: var(--mute); }
+.run.loaf .hrs { color: var(--ground); transition: color 1.6s ease; }
+@media (max-width: 560px) { .run .hrs .w { display: none; } }  /* a phone: the hours only, so the labels never meet */
 .scale { display: flex; justify-content: space-between; font-size: 13px; color: var(--faint); font-variation-settings: var(--mono); }
 .footnote { margin-top: 28px; font-size: 15px; color: var(--mute); max-width: 70ch; }
 
@@ -210,15 +213,19 @@ footer { padding: 70px 0 110px; display: flex; flex-wrap: wrap; justify-content:
     </div>
 
     <section id="battery">
-      <h2>An evening more on one charge.</h2>
-      <p class="intro">Same laptop, same screen brightness, nothing open, measured from what the battery itself reports. GNOME's desktop keeps itself busy; Loaf's waits for something to happen.</p>
-      <div class="timeline" role="img" aria-label="Idle time on a full 57 watt-hour battery: GNOME about 9 hours at 6.3 watts, Loaf about 10.4 to 11.4 hours at 5.0 to 5.5 watts.">
-        <div class="run gnome"><div class="bar"></div><span class="who">GNOME</span><span class="hrs">9 hours at 6.3 W</span></div>
-        <div class="run loaf"><div class="bar"></div><span class="who">Loaf</span><span class="hrs">10½ to 11½ hours at 5.0 to 5.5 W</span></div>
+      <h2>Calm when idle, lighter at work.</h2>
+      <p class="intro">Same laptop, same evening, same screen brightness, measured from what the battery itself reports. Doing nothing, Loaf and GNOME are equal. Once something moves on screen, niri does less than half of GNOME's compositing work, and that shows.</p>
+      <div class="timeline" role="img" aria-label="Hours on a full 57 watt-hour battery. In use: GNOME about 9 hours at 6.4 watts, Loaf about 9 and a half hours at 5.9 watts. Idle: both about 13 hours at 4.4 watts.">
+        <p class="group">In use: a browser scrolling, a video, switching tabs</p>
+        <div class="run gnome" style="--h: 8.93"><div class="bar"></div><span class="who">GNOME</span><span class="hrs">9 hours<span class="w"> at 6.4 W</span></span></div>
+        <div class="run loaf" style="--h: 9.69"><div class="bar"></div><span class="who">Loaf</span><span class="hrs">9½ hours<span class="w"> at 5.9 W</span></span></div>
+        <p class="group">Idle: nothing open</p>
+        <div class="run gnome" style="--h: 12.87"><div class="bar"></div><span class="who">GNOME</span><span class="hrs">13 hours<span class="w"> at 4.4 W</span></span></div>
+        <div class="run loaf" style="--h: 12.93"><div class="bar"></div><span class="who">Loaf</span><span class="hrs">13 hours<span class="w"> at 4.4 W</span></span></div>
         <div class="track"></div>
-        <div class="scale"><span>0 h</span><span>3 h</span><span>6 h</span><span>9 h</span><span>12 h</span></div>
+        <div class="scale"><span>0 h</span><span>3 h</span><span>6 h</span><span>9 h</span><span>12 h</span><span>15 h</span></div>
       </div>
-      <p class="footnote">Idle on a Framework 13 (AMD Ryzen AI 300), 57 Wh battery. The method and the raw numbers are in the repository, under <a href="https://github.com/CaptainPancakeWithBacon/loaf/tree/main/measurements">measurements</a>.</p>
+      <p class="footnote">A Framework 13 (AMD Ryzen AI 300), 57 Wh battery, both desktops set up the same way. The in-use work is a script, so both got exactly the same. The method and the raw numbers are in the repository, under <a href="https://github.com/CaptainPancakeWithBacon/loaf/tree/main/measurements">measurements</a>.</p>
     </section>
 
     <section id="inside">

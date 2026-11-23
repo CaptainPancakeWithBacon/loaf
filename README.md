@@ -18,11 +18,13 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/battery-dark.svg">
-    <img src="docs/battery-light.svg" alt="Idle on a full 57 Wh battery: GNOME about 9 hours at 6.3 W, Loaf about 10.5 to 11.5 hours at 5.0 to 5.5 W" width="720">
+    <img src="docs/battery-light.svg" alt="Hours on a full 57 Wh battery. In use: GNOME about 9 hours at 6.4 W, Loaf about 9½ hours at 5.9 W. Idle: both about 13 hours at 4.4 W" width="720">
   </picture>
 </p>
 
-<p align="center"><sub>Same laptop, same brightness, nothing open. Method and raw numbers in <a href="measurements/"><code>measurements/</code></a> and <a href="tools/baseline.py"><code>tools/baseline.py</code></a>.</sub></p>
+<p align="center"><sub>Same laptop, same evening, same brightness. Doing nothing, the two are equal; once something moves on screen,
+niri does less than half of GNOME's compositing work. Method and raw numbers in <a href="measurements/"><code>measurements/</code></a>,
+<a href="tools/baseline.py"><code>tools/baseline.py</code></a> and <a href="tools/busy.mjs"><code>tools/busy.mjs</code></a>.</sub></p>
 
 ## When you stop, it stops
 
