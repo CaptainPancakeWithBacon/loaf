@@ -7,7 +7,7 @@
 #                                   system install once for the login entry; the home folder wins over /etc.
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
-scripts="loaf-session loaf-power loaf-mirror loaf-brightness loaf-gtk-theme loaf-terminal"
+scripts="loaf-session loaf-power loaf-mirror loaf-brightness loaf-gtk-theme loaf-terminal loaf-fetch"
 # Ubuntu's login autostarts Loaf skips (systemd runs them as app-<name>@autostart.service; GNOME keeps them).
 # Your own ones in ~/.config/autostart are untouched.
 skip='update-notifier org.gnome.Evolution-alarm-notify print-applet org.kde.kdeconnect.daemon geoclue-demo-agent'

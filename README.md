@@ -38,6 +38,8 @@
 
 - **The bar.** The cat opens the launcher, then workspace dots, the date and time, and on the right Wi-Fi
   (with signal strength, a plug on a cable), watts in or out, time to empty or full, and the battery.
+- **Tray.** Apps that keep running without a window (Steam, Teams, Spotify) show their icon in the bar.
+  Click to open the app, right click for its own menu, with Quit.
 - **Launcher** (Super+D). Apps, settings and files in one search; an app that is already open gets focused.
 - **Notifications.** Cards in the corner, also over fullscreen windows. Missed one? Click the date and time:
   they wait there, with a dot next to the clock until you look. Do not disturb lets only urgent ones through.
