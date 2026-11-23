@@ -97,7 +97,12 @@ PanelWindow {
         }
     }
 
+    Media { // what is playing; hidden when nothing is
+        anchors { right: trayRow.left; rightMargin: 8; verticalCenter: parent.verticalCenter }
+    }
+
     Row {
+        id: trayRow
         anchors { right: quickBtn.left; rightMargin: 2; verticalCenter: parent.verticalCenter }
         Repeater {
             model: SystemTray.items
